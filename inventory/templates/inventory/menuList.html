@@ -1,0 +1,24 @@
+{% extends 'inventory/header.html' %}
+
+{% block content %}
+
+<h2>Menus</h2>
+
+<div>
+    <table>
+        <tbody>
+            {% for menu in menus %}
+                <tr>
+                    <td><a href="{% url 'menuview' menu.id %}">{{menu.name}}</a></td>
+                    <td><a href="{% url 'menuupdate' menu.id %}">Edit</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <br>
+    <button style="background-color: darkgrey;" type="button"><a href="{% url 'menucreate' %}">Add a menu</a></button>
+</div>
+
+
+{% endblock %}

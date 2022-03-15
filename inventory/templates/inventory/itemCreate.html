@@ -1,0 +1,16 @@
+{% extends 'inventory/header.html' %}
+
+{% block content %}
+
+<h2>{{ menu.name }}</h2>
+<hr>
+<h3>Add an item</h3>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
+    <input type="submit" value="Submit"/>
+</form>
+
+{% endblock %}

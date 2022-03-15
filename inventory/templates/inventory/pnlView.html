@@ -1,0 +1,39 @@
+{% extends 'inventory/header.html' %}
+
+{% block content %}
+
+<h2>Daily PNL Overview</h2>
+
+<div>
+    <table>
+        <thead>
+            <th style="text-align: left" width="100px">Date</th>
+            <th style="text-align: right" width="75px">Revenue</th>
+            <th style="text-align: right" width="75px">COGS</th>
+            <th style="text-align: right" width="125px">Gross Profit ($)</th>
+            <th style="text-align: right" width="125px">Gross Profit (%)</th>
+        </thead>
+        <tbody>
+            <!-- for day in days -->
+                <tr>
+                    <td style="text-align: left">Day</td>
+                    <td style="text-align: right">[rev]</td>
+                    <td style="text-align: right">[cogs]</td>
+                    <td style="text-align: right">[gp $]</td>
+                    <td style="text-align: right">[gp %]</td>
+                    <td style="text-align: right"><a>Edit</a></td>
+                </tr>
+            <!--  endfor  -->
+                <tr>
+                    <td style="text-align: left">Total</td>
+                    <td style="text-align: right">[rev]</td>
+                    <td style="text-align: right">[cogs]</td>
+                    <td style="text-align: right">[gp $]</td>
+                    <td style="text-align: right">[gp %]</td>
+                </tr>
+        </tbody>
+    </table>
+    <br>
+</div>
+
+{% endblock %}

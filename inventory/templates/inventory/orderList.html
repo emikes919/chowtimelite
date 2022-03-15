@@ -1,0 +1,53 @@
+{% extends 'inventory/header.html' %}
+
+{% block content %}
+
+<h2>Order History</h2>
+
+<div>
+    {% if orders != '' %}
+        <table>
+            <thead>
+                <th style="text-align: left" width="100px">Order #</th>
+                <th style="text-align: left">Order time</th>
+                <th style="text-align: right" width="125px">Customer</th>
+                <th style="text-align: right" width="125px">Items</th>
+                <th style="text-align: right" width="125px">Total</th>
+            </thead>
+            <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td align="left" valign="top">#{{ order.id }}</td>
+                    <td align="left" valign="top">{{ order.timestamp }}</td>
+                    <td align="right" valign="top">{{ order.customer }}</td>
+                    <td style="text-align: right">
+                        {% for item in order.menuItem.all %}
+                            {{ item.name }}
+                            <br>
+                        {% endfor %}
+                        <br>
+                    </td>
+                    <!-- <td style="text-align: right">{{ item.revenue }}</td> -->
+                    <td></td>
+                    <td align="right" valign="top" width="50px"><a href="{% url 'orderupdate' order.id %}">Edit</a></td>
+                </tr>
+            {% endfor %}
+                <tr style="background: lightgrey">
+                    <td>Total</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>[tbd sum total]</td>
+                </tr>
+            </tbody>
+        </table>
+    {% endif %}
+    <br>
+    <button style="background-color: darkgrey;" type="button"><a href="{% url 'ordercreate' %}">Create an order</a></button>
+</div>
+<br>
+<div>
+    <button style="background-color: darkgrey;" type="button"><a href="{% url 'pnlview' %}">View PNL</a></button>
+</div>
+
+{% endblock %}

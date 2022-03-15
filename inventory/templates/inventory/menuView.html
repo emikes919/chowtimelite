@@ -1,0 +1,28 @@
+{% extends 'inventory/header.html' %}
+
+{% block content %}
+
+<h2>{{menu.name}}</h2>
+
+<div>
+    <table>
+        <thead>
+            <th style="text-align: left">Item</th>
+            <th style="text-align: right">Price</th>
+        </thead>
+        <tbody>
+            {% for item in items %}
+                <tr>
+                    <td style="text-align: left">{{ item.name }}</td>
+                    <td style="text-align: right">{{ item.price }}</td>
+                    <td style="text-align: right"><a href="{% url 'itemupdate' item.id %}">Edit</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <br>
+    <button style="background-color: darkgrey;" type="button"><a href="{% url 'itemcreate' menu.id %}">Add an item</a></button>
+</div>
+
+{% endblock %}

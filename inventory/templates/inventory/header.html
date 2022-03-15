@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE-edge">
+        <title>Chowtime! Lite</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css"> -->
+
+        <h1><a href="{% url 'home' %}">Chowtime! Lite</a></h1>
+        <div>
+            <table>
+                <th>
+                    <td><a href="{% url 'inventorylist' %}">Inventory</a></td>
+                    <td><a href="{% url 'menulist' %}">Menus</a></td>
+                    <td><a href="{% url 'orderlist' %}">Orders</a></td>
+                </th>
+            </table>
+        </div>
+    </head>
+    <body>
+        {% block content %}
+        {% endblock %}
+    </body>
+</html>
+
+
