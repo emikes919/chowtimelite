@@ -2,15 +2,69 @@
 
 {% block content %}
 
+<style>
+    .hidden {
+        display: none
+    }
+</style>
+
 <div>
     <form method="POST" action="">
         {% csrf_token %}
         {{form.as_p}}
+        <br>
+        
+        {{ formset.management_form }}
+        
+        <div id="ingredient-form-list">
+            {% for ingredientForm in formset %}
+                <div class="ingredient-form">
+                    {{ ingredientForm }}
+                </div>
+                <hr>
+            {% endfor %}
+        </div>
+        
+        <div id="empty-form" class="hidden">
+            {{ formset.empty_form }}
+            <hr>
+        </div>
+
+        <br>
+        
+        <button id="add-more" type="button">Add an ingredient</button>
+        <br>
+        
         <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
         <input type="submit" value="Submit"/>
         <button style="background-color: darkred; color: white" type="button"><a href="{% url 'itemdelete' item.id %}">Delete</a></button>
     </form>
 </div>
 
+<script>
+    // get the button in question that we want to listen for - reference it by the button tag's 'id'
+    
+    const addMoreBtn = document.getElementById('add-more') // "document" refers to entire rendered HTML page
+    addMoreBtn.addEventListener('click', addNewForm)
+    const totalNewForms = document.getElementById('id_ingredientquantity_set-TOTAL_FORMS')
+    
+    function addNewForm (event) {
+        if (event) {
+            event.preventDefault() // if you accidentatily called the 'add-more' button type=submit, it would prevent it from submitting
+        }
+        const currentIngredientForms = document.getElementsByClassName('ingredient-form')
+        let currentFormCount = currentIngredientForms.length // + 1
+        const formCopyTarget = document.getElementById('ingredient-form-list')
+        const copyEmptyFormElement = document.getElementById('empty-form').cloneNode(true)
+        copyEmptyFormElement.setAttribute('class', 'ingredient-form')
+        copyEmptyFormElement.setAttribute('id',`ingredientquantity_set-${currentFormCount}`)
+        const regex = new RegExp('__prefix__', 'g')
+        copyEmptyFormElement.innerHTML = copyEmptyFormElement.innerHTML.replace(regex, currentFormCount)
+        totalNewForms.setAttribute('value', currentFormCount + 1)
+        // now add a new empty form element to our html form
+        formCopyTarget.append(copyEmptyFormElement)
+    }
+
+</script>
 
 {% endblock %}
