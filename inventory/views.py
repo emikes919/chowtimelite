@@ -1,6 +1,7 @@
+from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
-from .models import Ingredient, MenuItem, Menu, Order
-from .forms import InventoryCreateForm, MenuCreateForm, ItemCreateForm, OrderCreateForm
+from .models import Ingredient, IngredientQuantity, MenuItem, Menu, Order
+from .forms import InventoryCreateForm, MenuCreateForm, ItemCreateForm, OrderCreateForm, IngredientQuantityForm
 
 def landingPage(request):
     return render(request, 'inventory/landingPage.html')
@@ -103,7 +104,7 @@ def ItemCreate(request, pk):
             item = form.save(commit=False)
             item.menu = menu
             item.save()
-            form.save_m2m()
+            # form.save_m2m()
             return redirect('menuview', menu.id)
 
     context = {'form': form, 'menu': menu}
@@ -111,17 +112,26 @@ def ItemCreate(request, pk):
 
 def ItemUpdate(request, pk):
     item = MenuItem.objects.get(id=pk)
+
+    IngredientQuantityFormset = inlineformset_factory(
+        MenuItem, IngredientQuantity, fields=('ingredient', 'ingredientQuantity'), can_delete=False, extra=0
+    )
+    formset = IngredientQuantityFormset(instance=item)
     form = ItemCreateForm(instance=item)
 
     if request.method == 'POST':
+        print('request.POST :')
+        print(request.POST)
         form = ItemCreateForm(request.POST, instance=item)
-        if form.is_valid():
+        formset = IngredientQuantityFormset(request.POST, instance=item)
+        if (form.is_valid() and formset.is_valid()):
             form.save()
+            formset.save()
             print('item ingredients is:')
             print(item.ingredients)
             return redirect('menuview', item.menu.id)
     
-    context = {'form': form, 'item': item}
+    context = {'form': form, 'formset': formset, 'item': item}
     return render(request, 'inventory/itemEdit.html', context)
 
 def ItemDelete(request, pk):
