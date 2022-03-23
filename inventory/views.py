@@ -1,7 +1,8 @@
 from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
-from .models import Ingredient, IngredientQuantity, MenuItem, Menu, Order
-from .forms import InventoryCreateForm, MenuCreateForm, ItemCreateForm, OrderCreateForm, IngredientQuantityForm
+from .models import Ingredient, IngredientQuantity, MenuItem, Menu, Order, DishQuantity
+from .forms import InventoryCreateForm, MenuCreateForm, ItemCreateForm, OrderCreateForm
+from pprint import pprint
 
 def landingPage(request):
     return render(request, 'inventory/landingPage.html')
@@ -127,8 +128,6 @@ def ItemUpdate(request, pk):
         if (form.is_valid() and formset.is_valid()):
             form.save()
             formset.save()
-            print('item ingredients is:')
-            print(item.ingredients)
             return redirect('menuview', item.menu.id)
     
     context = {'form': form, 'formset': formset, 'item': item}
@@ -145,32 +144,54 @@ def ItemDelete(request, pk):
 
 def OrderList(request):
     orders = Order.objects.all()
-    context = {'orders': orders}
+    totalRevenue = 0
+
+    for order in orders:
+        totalRevenue += order.revenue()
+
+    context = {'orders': orders, 'totalrevenue': totalRevenue}
     return render(request, 'inventory/orderList.html', context)
 
 def OrderCreate(request):
+    DishQuantityFormset = inlineformset_factory(
+        Order, DishQuantity, fields=('menuItem', 'dishQuantity'), can_delete=False, extra=0
+    )
+    
     form = OrderCreateForm
+    formset = DishQuantityFormset()
 
     if request.method == 'POST':
+        print('request.POST :')
+        print(request.POST)
         form = OrderCreateForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('orderlist')
+            order = form.save()
+            formset = DishQuantityFormset(request.POST, instance=order)
+            if formset.is_valid():
+                formset.save()
+                return redirect('orderlist')
     
-    context = {'form': form}
+    context = {'form': form, 'formset': formset}
     return render(request, 'inventory/orderCreate.html', context)
 
 def OrderUpdate(request, pk):
     order = Order.objects.get(id=pk)
+    DishQuantityFormset = inlineformset_factory(
+        Order, DishQuantity, fields=('menuItem', 'dishQuantity'), can_delete=False, extra=0
+    )
+    
     form = OrderCreateForm(instance=order)
+    formset = DishQuantityFormset(instance=order)
 
     if request.method == 'POST':
         form = OrderCreateForm(request.POST, instance=order)
+        formset = DishQuantityFormset(request.POST, instance=order)
         if form.is_valid():
             form.save()
+            formset.save()
             return redirect('orderlist')
     
-    context = {'order': order, 'form': form}
+    context = {'order': order, 'form': form, 'formset': formset}
     return render(request, 'inventory/orderEdit.html', context)
 
 def OrderDelete(request, pk):
@@ -182,4 +203,36 @@ def OrderDelete(request, pk):
     return render(request, 'inventory/orderDelete.html', {'obj': order.id})
 
 def pnlView(request):
-    return render(request, 'inventory/pnlView.html')
+    orders = Order.objects.all()
+    orderdict = {}
+
+    # grab every unique date 
+    for order in orders:
+        orderdict[order.timestamp.date()] = {}
+    
+    def getRevenueFromOrders(orderlist):
+        revenue = 0
+        for order in orderlist:
+            revenue += order.revenue()
+        return revenue
+
+    def getCOGSFromOrders(orderlist):
+        cogs = 0
+        for order in orderlist:
+            cogs += order.COGS()
+        return cogs
+
+    for orderdate in orderdict.keys():
+        orderdict[orderdate]['revenue'] = getRevenueFromOrders(Order.objects.filter(timestamp__year=orderdate.year,
+                                                                                    timestamp__month=orderdate.month,
+                                                                                    timestamp__day=orderdate.day))
+        orderdict[orderdate]['COGS'] = getCOGSFromOrders(Order.objects.filter(timestamp__year=orderdate.year,
+                                                                              timestamp__month=orderdate.month,
+                                                                              timestamp__day=orderdate.day))
+        orderdict[orderdate]['GP$'] = orderdict[orderdate]['revenue'] - orderdict[orderdate]['COGS']
+        orderdict[orderdate]['GP%'] = '{:0.1%}'.format(orderdict[orderdate]['GP$'] / orderdict[orderdate]['revenue'])
+
+    pprint(orderdict)
+
+    context = {}
+    return render(request, 'inventory/pnlView.html', context)

@@ -21,13 +21,13 @@
                     <td align="left" valign="top">{{ order.timestamp }}</td>
                     <td align="right" valign="top">{{ order.customer }}</td>
                     <td style="text-align: right">
-                        {% for item in order.menuItem.all %}
-                            {{ item.name }}
+                        {% for dish in order.getDishQuantities %}
+                            {{ dish.menuItem }} ({{ dish.dishQuantity }}x)
                             <br>
                         {% endfor %}
                         <br>
                     </td>
-                    <!-- <td style="text-align: right">{{ item.revenue }}</td> -->
+                    <td style="text-align: right">{{ order.revenue }}</td>
                     <td></td>
                     <td align="right" valign="top" width="50px"><a href="{% url 'orderupdate' order.id %}">Edit</a></td>
                 </tr>
@@ -37,7 +37,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td>[tbd sum total]</td>
+                    <td>{{ totalrevenue }}</td>
                 </tr>
             </tbody>
         </table>

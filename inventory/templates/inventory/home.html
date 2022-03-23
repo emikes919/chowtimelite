@@ -7,14 +7,35 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css"> -->
 
-        <h1>Chowtime! Lite</h1>
     </head>
+    
+    <style>
+        h1 {
+            font-family: Montserrat;
+        }
+        
+        .nav button {
+            font-weight: bold;
+            font-family: Montserrat;
+            color: white;
+            background-color: #84CC16;
+            border-color: none;
+            outline: none;
+            border-radius: 8px;
+            width: 750px;
+            padding: 20px 50px 20px;
+        }
+
+    </style>
+
+    <h1>Chowtime! Lite</h1>
+    
     <body>
-        <div>
-            <button style="background-color: darkgrey;" type="button"><a href="{% url 'inventorylist' %}">Inventory</a></button>
+        <div class="nav">
+            <button type="button"><a href="{% url 'inventorylist' %}">Inventory</a></button>
             <br><br>
-            <button style="background-color: darkgrey;" type="button"><a href="{% url 'menulist' %}">Menus</a></button>
+            <button type="button"><a href="{% url 'menulist' %}">Menus</a></button>
             <br><br>
-            <button style="background-color: darkgrey;" type="button"><a href="{% url 'orderlist' %}">Orders</a></button>
+            <button type="button"><a href="{% url 'orderlist' %}">Orders</a></button>
         </div>
     </body>

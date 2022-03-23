@@ -17,18 +17,8 @@ class ItemCreateForm(forms.ModelForm):
     class Meta:
         model = MenuItem
         fields = ['name', 'price']
-        # exclude = ['menu',]
-    
-    # ingredients = forms.ModelMultipleChoiceField(queryset=Ingredient.objects.all(), widget=forms.CheckboxSelectMultiple)
-    # name = forms.CharField()
-    # price = forms.DecimalField(decimal_places=2)
-
-class IngredientQuantityForm(forms.ModelForm):
-    class Meta:
-        model = IngredientQuantity
-        fields = '__all__'
 
 class OrderCreateForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = ['customer',]

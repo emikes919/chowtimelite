@@ -1,4 +1,5 @@
 from django.db import models
+import datetime
 
 class Ingredient(models.Model):
     GRAM = 'GR'
@@ -25,7 +26,7 @@ class Ingredient(models.Model):
 
 class Menu(models.Model):
     name = models.CharField(max_length=200)
-    timeCreated = models.DateTimeField(auto_now=True)
+    timeCreated = models.DateTimeField(auto_now_add=True)
     timeUpdated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -40,26 +41,57 @@ class MenuItem(models.Model):
     def __str__(self):
         return self.name
 
+    def itemCost(self):
+        relevantIngredients = IngredientQuantity.objects.filter(menuItem=self)
+        cost = 0
+
+        for ingredient in relevantIngredients:
+            cost += (ingredient.ingredient.unitCost * ingredient.ingredientQuantity)
+
+        return cost
+
 class IngredientQuantity(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     menuItem = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     ingredientQuantity = models.IntegerField(default=0)
 
-    # class Meta:
-    #     unqiue_together = ('ingredient', 'menuItem')
-
     def __str__(self):
         return str(self.ingredient)
 
 class Order(models.Model):
-    menuItem = models.ManyToManyField(MenuItem)
-    timestamp = models.DateTimeField(auto_now=True)
+    menuItems = models.ManyToManyField(MenuItem, through='DishQuantity')
+    timestamp = models.DateTimeField(auto_now_add=True)
     customer = models.CharField(max_length=200)
+
+    def __str__(self):
+        return 'Order #' + str(self.id)
+
+    def getDishQuantities(self):
+        quantities = DishQuantity.objects.filter(order=self)
+        return quantities
+
+    def revenue(self):
+        selectedDishes = DishQuantity.objects.filter(order=self)
+        revenue = 0
+
+        for dish in selectedDishes:
+            revenue += (dish.menuItem.price * dish.dishQuantity)
+        
+        return revenue
     
-    # def revenue(self):
-    #     price = self.menuItem.price
-    #     return price * self.dishQuantity
-    
-    # def cost(self):
-    #     cost = self.dish.cost
-    #     return cost * self.dishQuantity
+    def COGS(self):
+        selectedDishes = DishQuantity.objects.filter(order=self)
+        cogs = 0
+
+        for dish in selectedDishes:
+            cogs = (dish.menuItem.itemCost() * dish.dishQuantity)
+        
+        return cogs
+
+class DishQuantity(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    menuItem = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
+    dishQuantity = models.IntegerField(default=0)
+
+    def __str__(self):
+        return str(self.order) + ' - ' + str(self.menuItem)

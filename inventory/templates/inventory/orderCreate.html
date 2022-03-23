@@ -2,14 +2,68 @@
 
 {% block content %}
 
+<style>
+    .hidden {
+        display: none
+    }
+</style>
+
 <div>
     <form method="POST" action="">
         {% csrf_token %}
         {{form.as_p}}
+        <br>
+
+        {{ formset.management_form }}
+        
+        <div id="dish-form-list">
+            {% for dishform in formset %}
+                <div class="dish-form">
+                    {{ dishform }}
+                </div>
+                <hr>
+            {% endfor %}
+        </div>
+
+        <div id="empty-form" class="hidden">
+            {{ formset.empty_form }}
+            <hr>
+        </div>
+
+        <br>
+        
+        <button id="add-more" type="button">Add a dish</button>
+        <br>
+
         <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
-        <input type="submit" value="Submit"/>
+        <input type="submit" value="Create order"/>
     </form>
 </div>
 
+<script>
+    // get the button in question that we want to listen for - reference it by the button tag's 'id'
+    
+    const addMoreBtn = document.getElementById('add-more') // "document" refers to entire rendered HTML page
+    addMoreBtn.addEventListener('click', addNewForm)
+    const totalNewForms = document.getElementById('id_dishquantity_set-TOTAL_FORMS')
+    
+    function addNewForm (event) {
+        if (event) {
+            event.preventDefault() // if you accidentatily called the 'add-more' button type=submit, it would prevent it from submitting
+        }
+        const currentDishForms = document.getElementsByClassName('dish-form')
+        let currentFormCount = currentDishForms.length // + 1
+        const formCopyTarget = document.getElementById('dish-form-list')
+        const copyEmptyFormElement = document.getElementById('empty-form').cloneNode(true)
+        copyEmptyFormElement.setAttribute('class', 'dish-form')
+        copyEmptyFormElement.setAttribute('id',`dishquantity_set-${currentFormCount}`)
+        const regex = new RegExp('__prefix__', 'g')
+        copyEmptyFormElement.innerHTML = copyEmptyFormElement.innerHTML.replace(regex, currentFormCount)
+        totalNewForms.setAttribute('value', currentFormCount + 1)
+        // now add a new empty form element to our html form
+        formCopyTarget.append(copyEmptyFormElement)
+    }
+
+</script>
 
 {% endblock %}
