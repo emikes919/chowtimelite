@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE-edge">
+        <title>Chowtime! Lite</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css"> -->
+    </head>
+    <body>
+        <h1>Welcome to Chowtime! Lite</h1>
+        <br>
+        <h3>Sign up!</h3>
+        
+        <div>
+            <form method="POST">
+                {% csrf_token %}
+                {{form.username.label}}:
+                {{form.username}}
+                <br>
+                <br>
+                {{form.email.label}}:
+                {{form.email}}
+                <br>
+                <br>
+                {{form.password1.label}}:
+                {{form.password1}}
+                <br>
+                <br>
+                {{form.password2.label}}:
+                {{form.password2}}
+                <input type="submit" value="Submit"/>
+            </form>
+        </div>
+
+        {{ form.errors }}
+        
+        <div>
+            <p>Already have an account? <a href="{% url 'login' %}">Login.</a></p>
+        </div>
+    </body>    
+</html>

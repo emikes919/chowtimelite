@@ -1,20 +1,67 @@
 from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
-from .models import Ingredient, IngredientQuantity, MenuItem, Menu, Order, DishQuantity
-from .forms import InventoryCreateForm, MenuCreateForm, ItemCreateForm, OrderCreateForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from pprint import pprint
+
+from .models import Ingredient, IngredientQuantity, MenuItem, Menu, Order, DishQuantity
+from .forms import InventoryCreateForm, MenuCreateForm, ItemCreateForm, OrderCreateForm, CreateUserForm
 
 def landingPage(request):
     return render(request, 'inventory/landingPage.html')
 
+def registerPage(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    else:
+        form = CreateUserForm()
+        if request.method == 'POST':
+            form = CreateUserForm(request.POST)
+            if form.is_valid():
+                form.save()
+                user = form.cleaned_data.get('username')
+                messages.success(request, 'Account was created for %s' % (user))
+                return redirect('login')
+        
+        context = {'form': form}
+        return render(request, 'inventory/register.html', context)
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('home') 
+    else:
+        if request.method == 'POST':
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+                return redirect('home')
+            else:
+                messages.info(request, 'Username OR password is incorrect.')
+
+        context = {}
+        return render(request, 'inventory/login.html', context)  
+
+def logoutView(request):
+    logout(request)
+    return redirect('landingpage')
+
+@login_required(login_url='login')
 def Home(request):
     return render(request, 'inventory/home.html')
 
+@login_required(login_url='login')
 def InventoryList(request):
     inventory = Ingredient.objects.all()
     context = {'inventory': inventory}
     return render(request, 'inventory/inventoryList.html', context)
 
+@login_required(login_url='login')
 def InventoryCreate(request):
     form = InventoryCreateForm()
 
@@ -27,6 +74,7 @@ def InventoryCreate(request):
     context = {'form': form}
     return render(request, 'inventory/inventoryCreate.html', context)
 
+@login_required(login_url='login')
 def InventoryUpdate(request, pk):
     inventory = Ingredient.objects.get(id=pk)
     form = InventoryCreateForm(instance=inventory)
@@ -40,6 +88,7 @@ def InventoryUpdate(request, pk):
     context = {'form': form, 'inventory': inventory}
     return render(request, 'inventory/inventoryEdit.html', context)
 
+@login_required(login_url='login')
 def InventoryDelete(request, pk):
     inventory = Ingredient.objects.get(id=pk)
     if request.method == 'POST':
@@ -48,11 +97,13 @@ def InventoryDelete(request, pk):
     
     return render(request, 'inventory/inventoryDelete.html', {'obj': inventory})
 
+@login_required(login_url='login')
 def MenuList(request):
     menus = Menu.objects.all()
     context = {'menus': menus}
     return render(request, 'inventory/menuList.html', context)
 
+@login_required(login_url='login')
 def MenuCreate(request):
     form = MenuCreateForm
 
@@ -65,12 +116,14 @@ def MenuCreate(request):
     context = {'form': form}
     return render(request, 'inventory/menuCreate.html', context)
 
+@login_required(login_url='login')
 def MenuView(request, pk):
     menu = Menu.objects.get(id=pk)
     items = MenuItem.objects.filter(menu=menu)
     context = {'menu': menu, 'items': items}
     return render(request, 'inventory/menuView.html', context)
 
+@login_required(login_url='login')
 def MenuUpdate(request, pk):
     menu = Menu.objects.get(id=pk)
     form = MenuCreateForm(instance=menu)
@@ -84,6 +137,7 @@ def MenuUpdate(request, pk):
     context = {'form': form, 'menu': menu}
     return render(request, 'inventory/menuUpdate.html', context)
 
+@login_required(login_url='login')
 def MenuDelete(request, pk):
     menu = Menu.objects.get(id=pk)
     if request.method == 'POST':
@@ -92,6 +146,7 @@ def MenuDelete(request, pk):
     
     return render(request, 'inventory/menuDelete.html', {'obj': menu})
 
+@login_required(login_url='login')
 def ItemCreate(request, pk):
     # how I did this:
     # https://stackoverflow.com/questions/8971606/how-to-set-foreign-key-during-form-completion-python-django
@@ -111,20 +166,25 @@ def ItemCreate(request, pk):
     context = {'form': form, 'menu': menu}
     return render(request, 'inventory/itemCreate.html', context)
 
+@login_required(login_url='login')
 def ItemUpdate(request, pk):
     item = MenuItem.objects.get(id=pk)
 
     IngredientQuantityFormset = inlineformset_factory(
-        MenuItem, IngredientQuantity, fields=('ingredient', 'ingredientQuantity'), can_delete=False, extra=0
+        MenuItem, IngredientQuantity, fields=('ingredient', 'ingredientQuantity'), can_delete=True, extra=0
     )
     formset = IngredientQuantityFormset(instance=item)
     form = ItemCreateForm(instance=item)
 
     if request.method == 'POST':
-        print('request.POST :')
-        print(request.POST)
+        pprint('request.POST :')
+        pprint(request.POST)
         form = ItemCreateForm(request.POST, instance=item)
         formset = IngredientQuantityFormset(request.POST, instance=item)
+        print('form valid?')
+        print(form.is_valid())
+        print('formset valid')
+        print(formset.is_valid())
         if (form.is_valid() and formset.is_valid()):
             form.save()
             formset.save()
@@ -133,6 +193,7 @@ def ItemUpdate(request, pk):
     context = {'form': form, 'formset': formset, 'item': item}
     return render(request, 'inventory/itemEdit.html', context)
 
+@login_required(login_url='login')
 def ItemDelete(request, pk):
     item = MenuItem.objects.get(id=pk)
     
@@ -142,6 +203,7 @@ def ItemDelete(request, pk):
     
     return render(request, 'inventory/itemDelete.html', {'obj': item})
 
+@login_required(login_url='login')
 def OrderList(request):
     orders = Order.objects.all()
     totalRevenue = 0
@@ -152,6 +214,7 @@ def OrderList(request):
     context = {'orders': orders, 'totalrevenue': totalRevenue}
     return render(request, 'inventory/orderList.html', context)
 
+@login_required(login_url='login')
 def OrderCreate(request):
     DishQuantityFormset = inlineformset_factory(
         Order, DishQuantity, fields=('menuItem', 'dishQuantity'), can_delete=False, extra=0
@@ -174,6 +237,7 @@ def OrderCreate(request):
     context = {'form': form, 'formset': formset}
     return render(request, 'inventory/orderCreate.html', context)
 
+@login_required(login_url='login')
 def OrderUpdate(request, pk):
     order = Order.objects.get(id=pk)
     DishQuantityFormset = inlineformset_factory(
@@ -194,6 +258,7 @@ def OrderUpdate(request, pk):
     context = {'order': order, 'form': form, 'formset': formset}
     return render(request, 'inventory/orderEdit.html', context)
 
+@login_required(login_url='login')
 def OrderDelete(request, pk):
     order = Order.objects.get(id=pk)
     if request.method == 'POST':
@@ -202,6 +267,7 @@ def OrderDelete(request, pk):
     
     return render(request, 'inventory/orderDelete.html', {'obj': order.id})
 
+@login_required(login_url='login')
 def pnlView(request):
     orders = Order.objects.all()
     orderdict = {}
@@ -222,6 +288,7 @@ def pnlView(request):
             cogs += order.COGS()
         return cogs
 
+    # populate value dicts for date keys with revenue, COGS, and GP for that date
     for orderdate in orderdict.keys():
         orderdict[orderdate]['revenue'] = getRevenueFromOrders(Order.objects.filter(timestamp__year=orderdate.year,
                                                                                     timestamp__month=orderdate.month,
@@ -229,10 +296,19 @@ def pnlView(request):
         orderdict[orderdate]['COGS'] = getCOGSFromOrders(Order.objects.filter(timestamp__year=orderdate.year,
                                                                               timestamp__month=orderdate.month,
                                                                               timestamp__day=orderdate.day))
-        orderdict[orderdate]['GP$'] = orderdict[orderdate]['revenue'] - orderdict[orderdate]['COGS']
-        orderdict[orderdate]['GP%'] = '{:0.1%}'.format(orderdict[orderdate]['GP$'] / orderdict[orderdate]['revenue'])
+        orderdict[orderdate]['GPdollar'] = orderdict[orderdate]['revenue'] - orderdict[orderdate]['COGS']
+        orderdict[orderdate]['GPpct'] = '{:0.1%}'.format(orderdict[orderdate]['GPdollar'] / orderdict[orderdate]['revenue'])
 
-    pprint(orderdict)
+    # calc subtotals of revenue, COGS, and GP
+    totalRevenue = 0
+    totalCOGS = 0
 
-    context = {}
+    for v in orderdict.values():
+        totalRevenue += v['revenue']
+        totalCOGS += v['COGS']
+
+    totalGPdollar = totalRevenue - totalCOGS
+    totalGPpct = '{:0.1%}'.format(totalGPdollar / totalRevenue)
+
+    context = {'orderdict': orderdict, 'totalRevenue': totalRevenue, 'totalCOGS': totalCOGS, 'totalGPdollar': totalGPdollar, 'totalGPpct': totalGPpct}
     return render(request, 'inventory/pnlView.html', context)

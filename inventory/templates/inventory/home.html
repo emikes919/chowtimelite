@@ -22,7 +22,7 @@
             border-color: none;
             outline: none;
             border-radius: 8px;
-            width: 750px;
+            width: 400px;
             padding: 20px 50px 20px;
         }
 
@@ -30,6 +30,11 @@
 
     <h1>Chowtime! Lite</h1>
     
+    <div>
+        <p><a href="{% url 'logout' %}">Logout</a></p>
+    </div>
+    <br>
+
     <body>
         <div class="nav">
             <button type="button"><a href="{% url 'inventorylist' %}">Inventory</a></button>

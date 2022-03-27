@@ -14,6 +14,7 @@
                     <td><a href="{% url 'inventorylist' %}">Inventory</a></td>
                     <td><a href="{% url 'menulist' %}">Menus</a></td>
                     <td><a href="{% url 'orderlist' %}">Orders</a></td>
+                    <td><a href="{% url 'logout' %}">Logout</a> {{ request.user }}</td>
                 </th>
             </table>
         </div>
