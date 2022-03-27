@@ -19,38 +19,24 @@
         
         {{ formset.management_form }}
         
-        <div id="ingredient-form-list">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Ingredient (unit)</th>
-                        <th>Quantity</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for ingredientForm in formset %}
-                        <div class="ingredient-form">
-                            {% for hidden in ingredientForm.hidden_fields %}
-                                {{ hidden }}
-                            {% endfor %}
-                            <tr>
-                                <td>{{ ingredientForm.ingredient }}</td>
-                                <td>{{ ingredientForm.ingredientQuantity }}</td>
-                                <td><button class="remove-button" id="remove-ingredient" type="button">Remove</button></td>
-                                <td><div>{{ ingredientForm.DELETE }}</div></td>
-                            </tr>
-                        </div>
+        <div id="ingredient-form-list">          
+            {% for ingredientForm in formset %}
+                <div id="ingredient-form" class="ingredient-form">
+                    {% for hidden in ingredientForm.hidden_fields %}
+                        {{ hidden }}
                     {% endfor %}
-                </tbody>
-            </table>
+                    {{ ingredientForm.ingredient }}
+                    {{ ingredientForm.ingredientQuantity }}
+                    <button class="remove-button" id="remove-ingredient" type="button">Remove</button>
+                    <div class="hidden">{{ ingredientForm.DELETE }}</div>
+                </div>
+            {% endfor %}
         </div>
         
         <div id="empty-form" class="hidden">
-            <tr>
-                <td>{{ formset.empty_form.ingredient }}</td>
-                <td>{{ formset.empty_form.ingredientQuantity }}</td>
-                <td><button class="remove-button" id="remove-ingredient" type="button">Remove</button></td>
-            </tr>
+            {{ formset.empty_form.ingredient }}
+            {{ formset.empty_form.ingredientQuantity }}
+            <button class="remove-button" id="remove-ingredient" type="button">Remove</button>
         </div>
         <br>
         
@@ -70,10 +56,16 @@
     addMoreBtn.addEventListener('click', addNewForm)
     const totalNewForms = document.getElementById('id_ingredientquantity_set-TOTAL_FORMS')
 
+    itemizeIngredientForms()
     removeBtnListener()
 
-    function itemtizeRemoveBtns () {
+    function itemizeIngredientForms () {
+        let ingredientForms = document.getElementsByClassName('ingredient-form')
 
+        for (let i = 0; i < ingredientForms.length; i++) {
+            ingredientForms[i].setAttribute('id', `ingredient-form-${i}`)
+            console.log(ingredientForms[i])
+        }
     }
 
     function removeBtnListener () {
@@ -88,8 +80,21 @@
         if (event) {
             event.preventDefault()
         }
-        console.log(event)
+        
+        let ingredientFormToBeRemoved = event.path[1]
+        let indexString = ingredientFormToBeRemoved.id
+        let array = indexString.split('-')
+        let indexNum = array[2]
+        let deleteCheckbox = document.getElementById(`id_ingredientquantity_set-${indexNum}-DELETE`)
+        deleteCheckbox.checked = true
+        ingredientFormToBeRemoved.setAttribute('class', 'hidden')
 
+        // console.log(event)
+        // console.log(event.path[1])
+        // console.log(`indexString: ${indexString}`)
+        // console.log(`array: ${array}`)
+        // console.log(`indexNum: ${indexNum}`)
+        // console.log(`deletCheckbox: ${deleteCheckbox}`)
         
     }
     
