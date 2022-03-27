@@ -6,7 +6,7 @@
         display: none
     }
 
-    th {
+    thead {
         text-align: left
     }
 </style>
@@ -18,25 +18,39 @@
         <br>
         
         {{ formset.management_form }}
+        
         <div id="ingredient-form-list">
-            {% for ingredientForm in formset %}
-                <div class="ingredient-form">
-                    {% for hidden in ingredientForm.hidden_fields %}
-                        {{ hidden }}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ingredient (unit)</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ingredientForm in formset %}
+                        <div class="ingredient-form">
+                            {% for hidden in ingredientForm.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                            <tr>
+                                <td>{{ ingredientForm.ingredient }}</td>
+                                <td>{{ ingredientForm.ingredientQuantity }}</td>
+                                <td><button class="remove-button" id="remove-ingredient" type="button">Remove</button></td>
+                                <td><div>{{ ingredientForm.DELETE }}</div></td>
+                            </tr>
+                        </div>
                     {% endfor %}
-                    {{ ingredientForm.ingredient }}
-                    {{ ingredientForm.ingredientQuantity }}
-                    <button class="remove-button" id="remove-0-ingredient" type="button">Remove</button>
-                    <hr>
-                </div>
-            {% endfor %}
+                </tbody>
+            </table>
         </div>
         
         <div id="empty-form" class="hidden">
-            {{ formset.empty_form.ingredient }}
-            {{ formset.empty_form.ingredientQuantity }}
-            <button class="remove-button" id="remove-__prefix__-ingredient" type="button">Remove</button>
-            <hr>
+            <tr>
+                <td>{{ formset.empty_form.ingredient }}</td>
+                <td>{{ formset.empty_form.ingredientQuantity }}</td>
+                <td><button class="remove-button" id="remove-ingredient" type="button">Remove</button></td>
+            </tr>
         </div>
         <br>
         
@@ -58,6 +72,10 @@
 
     removeBtnListener()
 
+    function itemtizeRemoveBtns () {
+
+    }
+
     function removeBtnListener () {
         const removeIngredientBtns = document.getElementsByClassName('remove-button')
         
@@ -71,6 +89,8 @@
             event.preventDefault()
         }
         console.log(event)
+
+        
     }
     
     function addNewForm (event) {

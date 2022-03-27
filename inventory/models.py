@@ -2,18 +2,18 @@ from django.db import models
 import datetime
 
 class Ingredient(models.Model):
-    GRAM = 'GR'
-    OUNCE = 'OZ'
-    ITEM = 'IT'
+    GRAM = 'Grams'
+    OUNCE = 'Ounces'
+    PIECE = 'Pieces'
 
     UNIT_CHOICES = [
-        ('GR', 'Grams'),
-        ('OZ', 'Ounces'),
-        ('IT', 'Item')
+        ('Grams', 'Grams'),
+        ('Ounces', 'Ounces'),
+        ('Pieces', 'Pieces')
     ]
 
     name = models.CharField(max_length=200)
-    unitType = models.CharField(max_length=200, choices=UNIT_CHOICES, default=ITEM)
+    unitType = models.CharField(max_length=200, choices=UNIT_CHOICES, default=PIECE)
     unitCost = models.DecimalField(max_digits=10, decimal_places=2)
     inventoryQuantity = models.DecimalField(max_digits=10, decimal_places=2)
     
