@@ -185,6 +185,8 @@ def ItemUpdate(request, pk):
         print(form.is_valid())
         print('formset valid')
         print(formset.is_valid())
+        print('formset errors')
+        print(formset.errors)
         if (form.is_valid() and formset.is_valid()):
             form.save()
             formset.save()

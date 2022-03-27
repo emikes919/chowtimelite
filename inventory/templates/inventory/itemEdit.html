@@ -21,7 +21,11 @@
         <div id="ingredient-form-list">
             {% for ingredientForm in formset %}
                 <div class="ingredient-form">
-                    {{ ingredientForm }}
+                    {% for hidden in ingredientForm.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    {{ ingredientForm.ingredient }}
+                    {{ ingredientForm.ingredientQuantity }}
                     <button class="remove-button" id="remove-0-ingredient" type="button">Remove</button>
                     <hr>
                 </div>
@@ -29,7 +33,8 @@
         </div>
         
         <div id="empty-form" class="hidden">
-            {{ formset.empty_form }}
+            {{ formset.empty_form.ingredient }}
+            {{ formset.empty_form.ingredientQuantity }}
             <button class="remove-button" id="remove-__prefix__-ingredient" type="button">Remove</button>
             <hr>
         </div>

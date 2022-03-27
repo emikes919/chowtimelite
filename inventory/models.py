@@ -13,12 +13,12 @@ class Ingredient(models.Model):
     ]
 
     name = models.CharField(max_length=200)
-    unitType = models.CharField(max_length=2, choices=UNIT_CHOICES, default=ITEM)
+    unitType = models.CharField(max_length=200, choices=UNIT_CHOICES, default=ITEM)
     unitCost = models.DecimalField(max_digits=10, decimal_places=2)
     inventoryQuantity = models.DecimalField(max_digits=10, decimal_places=2)
     
     def __str__(self):
-        return self.name
+        return self.name + ' (' + self.unitType + ')'
 
     def totalCost(self):
         result = self.inventoryQuantity * self.unitCost
