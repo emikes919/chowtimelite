@@ -7,11 +7,13 @@
 <div>
     <table>
         <thead>
-            <th style="text-align: left" width="125px">Date</th>
-            <th style="text-align: right" width="75px">Revenue</th>
-            <th style="text-align: right" width="75px">COGS</th>
-            <th style="text-align: right" width="125px">Gross Profit ($)</th>
-            <th style="text-align: right" width="125px">Gross Profit (%)</th>
+            <tr>
+                <th style="text-align: left" width="125px">Date</th>
+                <th style="text-align: right" width="75px">Revenue</th>
+                <th style="text-align: right" width="75px">COGS</th>
+                <th style="text-align: right" width="125px">Gross Profit ($)</th>
+                <th style="text-align: right" width="125px">Gross Profit (%)</th>
+            </tr>
         </thead>
         <tbody>
             {% for k, v in orderdict.items %}

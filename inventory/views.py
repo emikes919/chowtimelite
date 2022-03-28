@@ -219,7 +219,7 @@ def OrderList(request):
 @login_required(login_url='login')
 def OrderCreate(request):
     DishQuantityFormset = inlineformset_factory(
-        Order, DishQuantity, fields=('menuItem', 'dishQuantity'), can_delete=False, extra=0
+        Order, DishQuantity, fields=('menuItem', 'dishQuantity'), can_delete=True, extra=0
     )
     
     form = OrderCreateForm
@@ -243,7 +243,7 @@ def OrderCreate(request):
 def OrderUpdate(request, pk):
     order = Order.objects.get(id=pk)
     DishQuantityFormset = inlineformset_factory(
-        Order, DishQuantity, fields=('menuItem', 'dishQuantity'), can_delete=False, extra=0
+        Order, DishQuantity, fields=('menuItem', 'dishQuantity'), can_delete=True, extra=0
     )
     
     form = OrderCreateForm(instance=order)
@@ -311,6 +311,8 @@ def pnlView(request):
 
     totalGPdollar = totalRevenue - totalCOGS
     totalGPpct = '{:0.1%}'.format(totalGPdollar / totalRevenue)
+
+    pprint(orderdict)
 
     context = {'orderdict': orderdict, 'totalRevenue': totalRevenue, 'totalCOGS': totalCOGS, 'totalGPdollar': totalGPdollar, 'totalGPpct': totalGPpct}
     return render(request, 'inventory/pnlView.html', context)

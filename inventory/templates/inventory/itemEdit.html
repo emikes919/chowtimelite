@@ -5,8 +5,8 @@
     .hidden {
         display: none
     }
-
-    thead {
+    #ingredient-heading {
+        width: 245px;
         text-align: left
     }
 </style>
@@ -17,6 +17,15 @@
         {{form.as_p}}
         <br>
         
+        <table id="ingredient-heading">
+            <thead>
+                <tr>
+                    <th>Ingredient (unit)</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+        </table>
+
         {{ formset.management_form }}
         
         <div id="ingredient-form-list">          
@@ -27,8 +36,8 @@
                     {% endfor %}
                     {{ ingredientForm.ingredient }}
                     {{ ingredientForm.ingredientQuantity }}
-                    <button class="remove-button" id="remove-ingredient" type="button">Remove</button>
                     <div class="hidden">{{ ingredientForm.DELETE }}</div>
+                    <button class="remove-button" id="remove-ingredient" type="button">Remove</button>
                 </div>
             {% endfor %}
         </div>
@@ -36,6 +45,7 @@
         <div id="empty-form" class="hidden">
             {{ formset.empty_form.ingredient }}
             {{ formset.empty_form.ingredientQuantity }}
+            <div class="hidden">{{ formset.empty_form.DELETE }}</div>
             <button class="remove-button" id="remove-ingredient" type="button">Remove</button>
         </div>
         <br>
@@ -89,12 +99,12 @@
         deleteCheckbox.checked = true
         ingredientFormToBeRemoved.setAttribute('class', 'hidden')
 
-        // console.log(event)
-        // console.log(event.path[1])
-        // console.log(`indexString: ${indexString}`)
-        // console.log(`array: ${array}`)
-        // console.log(`indexNum: ${indexNum}`)
-        // console.log(`deletCheckbox: ${deleteCheckbox}`)
+        console.log(event)
+        console.log(event.path[1])
+        console.log(`indexString: ${indexString}`)
+        console.log(`array: ${array}`)
+        console.log(`indexNum: ${indexNum}`)
+        console.log(`deletCheckbox: ${deleteCheckbox}`)
         
     }
     
@@ -107,15 +117,16 @@
         const formCopyTarget = document.getElementById('ingredient-form-list')
         const copyEmptyFormElement = document.getElementById('empty-form').cloneNode(true)
         copyEmptyFormElement.setAttribute('class', 'ingredient-form')
-        copyEmptyFormElement.setAttribute('id',`ingredientquantity_set-${currentFormCount}`)
+        copyEmptyFormElement.setAttribute('id',`ingredient-form-${currentFormCount}`)
         
         const regex = new RegExp('__prefix__', 'g')
         copyEmptyFormElement.innerHTML = copyEmptyFormElement.innerHTML.replace(regex, currentFormCount)
         totalNewForms.setAttribute('value', currentFormCount + 1)
-        // copyEmptyFormElement.addEventListener('click', removeIngredient)
 
         // now add a new empty form element to our html form
         formCopyTarget.append(copyEmptyFormElement)
+        
+        // remap remove button listeners to the new list of forms
         removeBtnListener()
         console.log(event)
     }

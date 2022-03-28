@@ -6,6 +6,10 @@
     .hidden {
         display: none
     }
+    #dish-heading {
+        width: 325px;
+        text-align: left
+    }
 </style>
 
 <div>
@@ -14,20 +18,36 @@
         {{form.as_p}}
         <br>
 
+        <table id="dish-heading">
+            <thead>
+                <tr>
+                    <th>Dish</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+        </table>
+
         {{ formset.management_form }}
         
         <div id="dish-form-list">
             {% for dishform in formset %}
-                <div class="dish-form">
-                    {{ dishform }}
+                <div id="dish-form "class="dish-form">
+                    {% for hidden in dishform.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    {{ dishform.menuItem }}
+                    {{ dishform.dishQuantity }}
+                    <div class="hidden">{{ dishform.DELETE }}</div>
+                    <button class="remove-button" id="remove-dish" type="button">Remove</button>
                 </div>
-                <hr>
             {% endfor %}
         </div>
 
         <div id="empty-form" class="hidden">
-            {{ formset.empty_form }}
-            <hr>
+            {{ formset.empty_form.menuItem }}
+            {{ formset.empty_form.dishQuantity }}
+            <div class="hidden">{{ formset.empty_form.DELETE }}</div>
+            <button class="remove-button" id="remove-dish" type="button">Remove</button>
         </div>
 
         <br>
@@ -47,6 +67,48 @@
     addMoreBtn.addEventListener('click', addNewForm)
     const totalNewForms = document.getElementById('id_dishquantity_set-TOTAL_FORMS')
     
+    itemizeDishForms()
+    removeBtnListener()
+
+    function itemizeDishForms () {
+        let dishForms = document.getElementsByClassName('dish-form')
+
+        for (let i = 0; i < dishForms.length; i++) {
+            dishForms[i].setAttribute('id', `dish-form-${i}`)
+            console.log(dishForms[i])
+        }
+    }
+
+    function removeBtnListener () {
+        const removeDishBtns = document.getElementsByClassName('remove-button')
+        
+        for (let i = 0; i < removeDishBtns.length; i++) {
+            removeDishBtns[i].addEventListener('click', removeDish)
+        }
+    }
+
+    function removeDish (event) {
+        if (event) {
+            event.preventDefault()
+        }
+        
+        let dishFormToBeRemoved = event.path[1]
+        let indexString = dishFormToBeRemoved.id
+        let array = indexString.split('-')
+        let indexNum = array[2]
+        let deleteCheckbox = document.getElementById(`id_dishquantity_set-${indexNum}-DELETE`)
+        deleteCheckbox.checked = true
+        dishFormToBeRemoved.setAttribute('class', 'hidden')
+
+        console.log(event)
+        console.log(event.path[1])
+        console.log(`indexString: ${indexString}`)
+        console.log(`array: ${array}`)
+        console.log(`indexNum: ${indexNum}`)
+        console.log(`deletCheckbox: ${deleteCheckbox}`)
+        
+    }
+
     function addNewForm (event) {
         if (event) {
             event.preventDefault() // if you accidentatily called the 'add-more' button type=submit, it would prevent it from submitting
@@ -56,12 +118,18 @@
         const formCopyTarget = document.getElementById('dish-form-list')
         const copyEmptyFormElement = document.getElementById('empty-form').cloneNode(true)
         copyEmptyFormElement.setAttribute('class', 'dish-form')
-        copyEmptyFormElement.setAttribute('id',`dishquantity_set-${currentFormCount}`)
+        copyEmptyFormElement.setAttribute('id',`dish-form-${currentFormCount}`)
+
         const regex = new RegExp('__prefix__', 'g')
         copyEmptyFormElement.innerHTML = copyEmptyFormElement.innerHTML.replace(regex, currentFormCount)
         totalNewForms.setAttribute('value', currentFormCount + 1)
+
         // now add a new empty form element to our html form
         formCopyTarget.append(copyEmptyFormElement)
+
+        // remap remove button listeners to the new list of forms
+        removeBtnListener()
+        console.log(event)
     }
 
 </script>
