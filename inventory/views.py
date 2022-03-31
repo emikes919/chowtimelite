@@ -224,6 +224,9 @@ def OrderCreate(request):
     
     form = OrderCreateForm
     formset = DishQuantityFormset()
+    
+    error = False
+    error_messages = {}
 
     if request.method == 'POST':
         print('request.POST :')
@@ -231,12 +234,66 @@ def OrderCreate(request):
         form = OrderCreateForm(request.POST)
         if form.is_valid():
             order = form.save()
+            
             formset = DishQuantityFormset(request.POST, instance=order)
             if formset.is_valid():
-                formset.save()
-                return redirect('orderlist')
+                dishLIST = []
+                ingredientDICT = {}
+
+                for form in formset:
+                    formData = form.cleaned_data # grab underlying data from the form
+                    print('formData is: ')
+                    print(formData)
+
+                    dish = formData['menuItem']           
+                    dishLIST.append(dish) # make a list of each dish name in the order
+                    menuItem = MenuItem.objects.get(name=dish) # grab the MenuItem DB object based on menuItem in form
+                    
+                    # loop through ingredients in that MenuItem to populate blank dict
+                    for ingredient in IngredientQuantity.objects.filter(menuItem=menuItem): 
+                        
+                        # check if ingredient is already in blank dict to prevent overwriting, else map name and quantity to dict as k, v pair 
+                        name = ingredient.ingredient.name
+                        ingredient_quantity_per_dish = ingredient.ingredientQuantity
+                        dish_quantity = formData['dishQuantity']
+                        total_quantity_requirement = ingredient_quantity_per_dish * dish_quantity
+                        
+                        if name in ingredientDICT.keys():
+                            ingredientDICT[name] = ingredientDICT[name] + total_quantity_requirement
+                        else:
+                            ingredientDICT[name] = total_quantity_requirement
+
+                        # run validation logic - error message list populated if not enough inventory is available
+                        ingredient_object_to_check = Ingredient.objects.get(name=name)
+                        current_quantity = ingredient_object_to_check.inventoryQuantity
+                        unit = ingredient_object_to_check.unitType
+                        
+                        if current_quantity < total_quantity_requirement:
+                            error = True
+                            error_message = f'Not enough inventory. You only have {current_quantity} {unit} of {name} left.'
+                            error_messages[dish] = error_message
+
+                print('ingredient DICT:')
+                pprint(ingredientDICT)
+                
+                print('dishLIST:')
+                pprint(dishLIST)
+
+                print('ERROR LIST:')
+                print(error_messages)
+                
+                # check if an error has been triggered, if not update the DB and redirect
+                if not error:
+                    for i in ingredientDICT.keys(): # loop through the ingredients themselves to gather what we need to adjust the DB
+                        ingredient_to_adjust = Ingredient.objects.get(name=i)
+                        ingredient_to_adjust.inventoryQuantity -= ingredientDICT[i]
+                        ingredient_to_adjust.save()
+                    formset.save()
+                    return redirect('orderlist')
+                
+                # return redirect('orderlist')
     
-    context = {'form': form, 'formset': formset}
+    context = {'form': form, 'formset': formset, 'error': error, 'error_messages': error_messages}
     return render(request, 'inventory/orderCreate.html', context)
 
 @login_required(login_url='login')
