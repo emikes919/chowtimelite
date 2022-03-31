@@ -39,6 +39,7 @@
                     {{ dishform.dishQuantity }}
                     <div class="hidden">{{ dishform.DELETE }}</div>
                     <button class="remove-button" id="remove-dish" type="button">Remove</button>
+                    <div id="error-message" class="">Error message</div>
                 </div>
             {% endfor %}
         </div>
@@ -53,8 +54,10 @@
         <br>
         
         <button id="add-more" type="button">Add a dish</button>
+        
         <br>
-
+        <br>
+        
         <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
         <input type="submit" value="Create order"/>
     </form>
