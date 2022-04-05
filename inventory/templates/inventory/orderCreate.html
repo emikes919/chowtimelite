@@ -1,5 +1,5 @@
 {% extends 'inventory/header.html' %}
-
+{% load custom_filters %}
 {% block content %}
 
 <style>
@@ -9,6 +9,9 @@
     #dish-heading {
         width: 325px;
         text-align: left
+    }
+    .error-message {
+        color: red;
     }
 </style>
 
@@ -31,7 +34,7 @@
         
         <div id="dish-form-list">
             {% for dishform in formset %}
-                <div id="dish-form "class="dish-form">
+                <div id="dish-form" class="dish-form">
                     {% for hidden in dishform.hidden_fields %}
                         {{ hidden }}
                     {% endfor %}
@@ -39,7 +42,7 @@
                     {{ dishform.dishQuantity }}
                     <div class="hidden">{{ dishform.DELETE }}</div>
                     <button class="remove-button" id="remove-dish" type="button">Remove</button>
-                    <div id="error-message" class="">Error message</div>
+                    <div id="error-message" class="error-message"></div>
                 </div>
             {% endfor %}
         </div>
@@ -59,7 +62,7 @@
         <br>
         
         <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
-        <input type="submit" value="Create order"/>
+        <input id="create-order" type="submit" value="Create order"/>
     </form>
 </div>
 
@@ -69,16 +72,51 @@
     const addMoreBtn = document.getElementById('add-more') // "document" refers to entire rendered HTML page
     addMoreBtn.addEventListener('click', addNewForm)
     const totalNewForms = document.getElementById('id_dishquantity_set-TOTAL_FORMS')
+
+    let dishLIST = JSON.parse("{{ dishLIST|escapejs }}")
+    console.log('dishLIST: ')
+    console.log(dishLIST)
     
     itemizeDishForms()
+    itemizeErrorMessages()
     removeBtnListener()
+    displayErrorMessage()
+    
+    function displayErrorMessage () {
+        let dishLIST = JSON.parse("{{ dishLIST|escapejs }}")
+        let errorMessageDICT = JSON.parse("{{ error_messages|escapejs }}")
+        
+        for (let i = 0; i < dishLIST.length; i++) {
+            let dish = dishLIST[i]
+            console.log('dish is:')
+            console.log(dish)
+            
+            errorMessage = errorMessageDICT[dish]
+            console.log('error message is:')
+            console.log(errorMessage)
+
+            if (errorMessage != undefined) {
+                let errorMessageDiv = document.getElementById(`error-message-${i}`)
+                errorMessageDiv.innerHTML = errorMessageDiv.innerHTML + errorMessage
+            }
+        }
+    }
 
     function itemizeDishForms () {
         let dishForms = document.getElementsByClassName('dish-form')
-
+        
         for (let i = 0; i < dishForms.length; i++) {
             dishForms[i].setAttribute('id', `dish-form-${i}`)
             console.log(dishForms[i])
+        }
+    }
+
+    function itemizeErrorMessages () {
+        let errorMessages = document.getElementsByClassName('error-message')
+
+        for (let i = 0; i < errorMessages.length; i++) {
+            errorMessages[i].setAttribute('id', `error-message-${i}`)
+            console.log(errorMessages[i])
         }
     }
 

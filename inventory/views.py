@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from pprint import pprint
+import json
 
 from .models import Ingredient, IngredientQuantity, MenuItem, Menu, Order, DishQuantity
 from .forms import InventoryCreateForm, MenuCreateForm, ItemCreateForm, OrderCreateForm, CreateUserForm
@@ -227,6 +228,7 @@ def OrderCreate(request):
     
     error = False
     error_messages = {}
+    dishLIST = []
 
     if request.method == 'POST':
         print('request.POST :')
@@ -237,16 +239,17 @@ def OrderCreate(request):
             
             formset = DishQuantityFormset(request.POST, instance=order)
             if formset.is_valid():
-                dishLIST = []
                 ingredientDICT = {}
 
-                for form in formset:
-                    formData = form.cleaned_data # grab underlying data from the form
+                for f in formset:
+                    formData = f.cleaned_data # grab underlying data from the form
                     print('formData is: ')
                     print(formData)
 
-                    dish = formData['menuItem']           
-                    dishLIST.append(dish) # make a list of each dish name in the order
+
+                    dish = formData['menuItem']
+                    dish_name = dish.name
+                    dishLIST.append(dish_name) # make a list of each dish name in the order
                     menuItem = MenuItem.objects.get(name=dish) # grab the MenuItem DB object based on menuItem in form
                     
                     # loop through ingredients in that MenuItem to populate blank dict
@@ -270,8 +273,8 @@ def OrderCreate(request):
                         
                         if current_quantity < total_quantity_requirement:
                             error = True
-                            error_message = f'Not enough inventory. You only have {current_quantity} {unit} of {name} left.'
-                            error_messages[dish] = error_message
+                            error_message = f'Not enough inventory. You have {current_quantity} {unit} of {name} left.'
+                            error_messages[dish_name] = error_message
 
                 print('ingredient DICT:')
                 pprint(ingredientDICT)
@@ -290,10 +293,10 @@ def OrderCreate(request):
                         ingredient_to_adjust.save()
                     formset.save()
                     return redirect('orderlist')
-                
-                # return redirect('orderlist')
-    
-    context = {'form': form, 'formset': formset, 'error': error, 'error_messages': error_messages}
+
+    dishLIST = json.dumps(dishLIST)
+    error_messages = json.dumps(error_messages)
+    context = {'form': form, 'formset': formset, 'error': error, 'error_messages': error_messages, 'dishLIST': dishLIST}
     return render(request, 'inventory/orderCreate.html', context)
 
 @login_required(login_url='login')
