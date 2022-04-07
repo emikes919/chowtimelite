@@ -66,9 +66,7 @@
     </form>
 </div>
 
-<script>
-    // get the button in question that we want to listen for - reference it by the button tag's 'id'
-    
+<script> 
     const addMoreBtn = document.getElementById('add-more') // "document" refers to entire rendered HTML page
     addMoreBtn.addEventListener('click', addNewForm)
     const totalNewForms = document.getElementById('id_dishquantity_set-TOTAL_FORMS')
@@ -81,7 +79,20 @@
     itemizeErrorMessages()
     removeBtnListener()
     displayErrorMessage()
+    hideDeletedFormsOnRender()
     
+    function hideDeletedFormsOnRender () {
+        let dishforms = document.getElementsByClassName('dish-form')
+
+        for (i = 0; i < dishforms.length; i++) {
+            deleteCheckbox = document.getElementById(`id_dishquantity_set-${i}-DELETE`)
+            if (deleteCheckbox.checked == true) {
+                let dishFormToHide = document.getElementById(`dish-form-${i}`)
+                dishFormToHide.style.display = 'none'
+            }
+        }
+    }
+
     function displayErrorMessage () {
         let dishLIST = JSON.parse("{{ dishLIST|escapejs }}")
         let errorMessageDICT = JSON.parse("{{ error_messages|escapejs }}")
@@ -139,7 +150,8 @@
         let indexNum = array[2]
         let deleteCheckbox = document.getElementById(`id_dishquantity_set-${indexNum}-DELETE`)
         deleteCheckbox.checked = true
-        dishFormToBeRemoved.setAttribute('class', 'hidden')
+        // dishFormToBeRemoved.setAttribute('class', 'hidden')
+        dishFormToBeRemoved.style.display = 'none'
 
         console.log(event)
         console.log(event.path[1])

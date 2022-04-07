@@ -246,35 +246,36 @@ def OrderCreate(request):
                     print('formData is: ')
                     print(formData)
 
-
                     dish = formData['menuItem']
                     dish_name = dish.name
                     dishLIST.append(dish_name) # make a list of each dish name in the order
-                    menuItem = MenuItem.objects.get(name=dish) # grab the MenuItem DB object based on menuItem in form
                     
-                    # loop through ingredients in that MenuItem to populate blank dict
-                    for ingredient in IngredientQuantity.objects.filter(menuItem=menuItem): 
+                    if formData['DELETE'] == False:
+                        menuItem = MenuItem.objects.get(name=dish) # grab the MenuItem DB object based on menuItem in form
                         
-                        # check if ingredient is already in blank dict to prevent overwriting, else map name and quantity to dict as k, v pair 
-                        name = ingredient.ingredient.name
-                        ingredient_quantity_per_dish = ingredient.ingredientQuantity
-                        dish_quantity = formData['dishQuantity']
-                        total_quantity_requirement = ingredient_quantity_per_dish * dish_quantity
-                        
-                        if name in ingredientDICT.keys():
-                            ingredientDICT[name] = ingredientDICT[name] + total_quantity_requirement
-                        else:
-                            ingredientDICT[name] = total_quantity_requirement
+                        # loop through ingredients in that MenuItem to populate blank dict
+                        for ingredient in IngredientQuantity.objects.filter(menuItem=menuItem): 
+                            
+                            # check if ingredient is already in blank dict to prevent overwriting, else map name and quantity to dict as k, v pair 
+                            name = ingredient.ingredient.name
+                            ingredient_quantity_per_dish = ingredient.ingredientQuantity
+                            dish_quantity = formData['dishQuantity']
+                            total_quantity_requirement = ingredient_quantity_per_dish * dish_quantity
+                            
+                            if name in ingredientDICT.keys():
+                                ingredientDICT[name] = ingredientDICT[name] + total_quantity_requirement
+                            else:
+                                ingredientDICT[name] = total_quantity_requirement
 
-                        # run validation logic - error message list populated if not enough inventory is available
-                        ingredient_object_to_check = Ingredient.objects.get(name=name)
-                        current_quantity = ingredient_object_to_check.inventoryQuantity
-                        unit = ingredient_object_to_check.unitType
-                        
-                        if current_quantity < total_quantity_requirement:
-                            error = True
-                            error_message = f'Not enough inventory. You have {current_quantity} {unit} of {name} left.'
-                            error_messages[dish_name] = error_message
+                            # run validation logic - error message list populated if not enough inventory is available
+                            ingredient_object_to_check = Ingredient.objects.get(name=name)
+                            current_quantity = ingredient_object_to_check.inventoryQuantity
+                            unit = ingredient_object_to_check.unitType
+                            
+                            if current_quantity < total_quantity_requirement:
+                                error = True
+                                error_message = f'Not enough inventory. You have {current_quantity} {unit} of {name} left.'
+                                error_messages[dish_name] = error_message
 
                 print('ingredient DICT:')
                 pprint(ingredientDICT)
