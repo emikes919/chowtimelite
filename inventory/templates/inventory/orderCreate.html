@@ -19,7 +19,11 @@
     <form method="POST" action="">
         {% csrf_token %}
         {{form.as_p}}
-        <br>
+        
+        <div id="order-level-error-message-div" style="display: none">
+            <p>You do not have enough inventory for this order</p>
+            <ul id="order-level-error-message-list"></ul>
+        </div>
 
         <table id="dish-heading">
             <thead>
@@ -75,11 +79,20 @@
     console.log('dishLIST: ')
     console.log(dishLIST)
     
+    let ingredient_error_list = JSON.parse("{{ error_messages_order_level|escapejs }}")
+    console.log('ORDER LEVEL ERROR LIST:')
+    console.log(ingredient_error_list)
+
+    let dish_level_ingredient_requirements = JSON.parse("{{ error_messages_dish_level|escapejs }}")
+    console.log('DISH LEVEL ERROR LIST:')
+    console.log(dish_level_ingredient_requirements)
+
     itemizeDishForms()
-    itemizeErrorMessages()
     removeBtnListener()
-    displayErrorMessage()
     hideDeletedFormsOnRender()
+    itemizeErrorMessages()
+    displayOrderLevelErrorMessage()
+    displayDishLevelErrorMessage()
     
     function hideDeletedFormsOnRender () {
         let dishforms = document.getElementsByClassName('dish-form')
@@ -93,20 +106,40 @@
         }
     }
 
-    function displayErrorMessage () {
-        let dishLIST = JSON.parse("{{ dishLIST|escapejs }}")
-        let errorMessageDICT = JSON.parse("{{ error_messages|escapejs }}")
+    function displayOrderLevelErrorMessage() {       
+        let error = "{{ error }}"
+        let ingredient_error_list = JSON.parse("{{ error_messages_order_level|escapejs }}")
+        let errorMessageDiv = document.getElementById('order-level-error-message-div')
+        let errorMessageUL = document.getElementById('order-level-error-message-list')
         
+        for (let [ingredient, data] of Object.entries(ingredient_error_list)) {
+            let quantity = Object.keys(data)
+            let unit = data[quantity]
+            errorMessageUL.innerHTML = errorMessageUL.innerHTML + `<li>${ingredient}: ${quantity} ${unit} remaining</li>`
+            }
+     
+        if (error == 'True') {
+            errorMessageDiv.style.display = 'block'
+            errorMessageDiv.style.color = 'red'
+        }
+    }
+
+    function displayDishLevelErrorMessage () {     
+        let dishLIST = JSON.parse("{{ dishLIST|escapejs }}")
+        let dish_level_ingredient_requirements = JSON.parse("{{ error_messages_dish_level|escapejs }}")
+        let dish_error_list = Object.keys(dish_level_ingredient_requirements)
+
         for (let i = 0; i < dishLIST.length; i++) {
             let dish = dishLIST[i]
-            console.log('dish is:')
-            console.log(dish)
-            
-            errorMessage = errorMessageDICT[dish]
-            console.log('error message is:')
-            console.log(errorMessage)
+            if (dish_error_list.includes(dish)) {
+                errorMessage = ''
 
-            if (errorMessage != undefined) {
+                for (let [ingredient, data] of Object.entries(dish_level_ingredient_requirements[dish])) {
+                    let quantity = Object.keys(data)
+                    let unit = data[quantity]
+                    errorMessage += `${quantity} ${unit} ${ingredient} required`
+                }
+                
                 let errorMessageDiv = document.getElementById(`error-message-${i}`)
                 errorMessageDiv.innerHTML = errorMessageDiv.innerHTML + errorMessage
             }
