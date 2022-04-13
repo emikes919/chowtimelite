@@ -113,10 +113,10 @@
         let errorMessageUL = document.getElementById('order-level-error-message-list')
         
         for (let [ingredient, data] of Object.entries(ingredient_error_list)) {
-            let quantity = Object.keys(data)
+            let quantity = Object.keys(data)[0]
             let unit = data[quantity]
-            errorMessageUL.innerHTML = errorMessageUL.innerHTML + `<li>${ingredient}: ${quantity} ${unit} remaining</li>`
-            }
+            errorMessageUL.innerHTML = errorMessageUL.innerHTML + `<li>${ingredient}: ${quantity} ${unit.toLowerCase()} remaining</li>`
+        }
      
         if (error == 'True') {
             errorMessageDiv.style.display = 'block'
@@ -127,19 +127,19 @@
     function displayDishLevelErrorMessage () {     
         let dishLIST = JSON.parse("{{ dishLIST|escapejs }}")
         let dish_level_ingredient_requirements = JSON.parse("{{ error_messages_dish_level|escapejs }}")
-        let dish_error_list = Object.keys(dish_level_ingredient_requirements)
 
         for (let i = 0; i < dishLIST.length; i++) {
-            let dish = dishLIST[i]
-            if (dish_error_list.includes(dish)) {
-                errorMessage = ''
-
-                for (let [ingredient, data] of Object.entries(dish_level_ingredient_requirements[dish])) {
-                    let quantity = Object.keys(data)
-                    let unit = data[quantity]
-                    errorMessage += `${quantity} ${unit} ${ingredient} required`
-                }
+            if (dish_level_ingredient_requirements[i] != {}) {
                 
+                let errorMessage = []
+                for (let [ingredient, data] of Object.entries(dish_level_ingredient_requirements[i])) {
+                    let quantity = Object.keys(data)[0]
+                    let unit = data[quantity]
+                    errorMessage.push(`${quantity} ${unit.toLowerCase()} ${ingredient.toLowerCase()} required`)
+                }
+    
+                errorMessage = errorMessage.join('; ')
+    
                 let errorMessageDiv = document.getElementById(`error-message-${i}`)
                 errorMessageDiv.innerHTML = errorMessageDiv.innerHTML + errorMessage
             }

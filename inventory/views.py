@@ -1,3 +1,4 @@
+from black import diff
 from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
@@ -238,8 +239,8 @@ def OrderCreate(request):
         form = OrderCreateForm(request.POST)
         if form.is_valid():
             order = form.save()
-            
             formset = DishQuantityFormset(request.POST, instance=order)
+
             if formset.is_valid():
                 for f in formset:
                     formData = f.cleaned_data # grab underlying data from the form
@@ -267,12 +268,12 @@ def OrderCreate(request):
                             else:
                                 ingredientDICT[name] = total_quantity_requirement
 
-                print('ingredient DICT:')
-                pprint(ingredientDICT)
-                print()
-
                 print('dishLIST:')
                 pprint(dishLIST)
+                print()
+
+                print('ingredient DICT:')
+                pprint(ingredientDICT)
                 print()
 
                 # run order level validation logic - error message list populated with current quantity of ingredient available
@@ -292,12 +293,15 @@ def OrderCreate(request):
                 print()
                 
                 # populate dish level error messages
-                for f in formset:
+                for i in range(0, len(formset)):
+                    f = formset[i]
                     formData = f.cleaned_data
                     if formData['DELETE'] == False:
                         dish = formData['menuItem']
+                        dish_id = i
                         dish_name = dish.name
                         menuItem = MenuItem.objects.get(name=dish)
+                        dish_ingredientsDICT = {}
                         for ingredient in IngredientQuantity.objects.filter(menuItem=menuItem): 
                             ingredient_name = ingredient.ingredient.name
                             
@@ -307,14 +311,10 @@ def OrderCreate(request):
                                 required_quantity = ingredient_quantity_per_dish * dish_quantity
                                 unit = ingredient.ingredient.unitType
 
-                                '''# make sure dish isn't already in the error list or dishes will multiple errors will be overwritten, 
-                                and only one ingredient error will be assigned to the dish'''
-                                if dish_name not in error_messages_dish_level.keys(): 
-                                    error_messages_dish_level[dish_name] = {}
-                                
-                                error_messages_dish_level[dish_name][ingredient_name] = {}
-                                error_messages_dish_level[dish_name][ingredient_name][required_quantity] = unit
-                                
+                                dish_ingredientsDICT[ingredient_name] = {}
+                                dish_ingredientsDICT[ingredient_name][required_quantity] = unit
+
+                        error_messages_dish_level[dish_id] = dish_ingredientsDICT
 
                 print('DISH LEVEL ERROR LIST:')
                 pprint(error_messages_dish_level)
@@ -382,18 +382,20 @@ def OrderUpdate(request, pk):
     pprint(existing_ingredientDICT)
     print()
     
-
+    error = False
+    error_messages_order_level = {}
+    error_messages_dish_level = {}
+    new_dishLIST = []
+    new_ingredientDICT = {}
+    diff_dishLIST = []
+    diff_ingredientDICT = {}
+    
     if request.method == 'POST':
         form = OrderCreateForm(request.POST, instance=order)
         formset = DishQuantityFormset(request.POST, instance=order)
 
-        error = False
-        error_messages = {}
-        new_dishLIST = []
-
         if form.is_valid() and formset.is_valid():
             form.save()
-            new_ingredientDICT = {}
 
             for new_form in formset:
                 new_form_data = new_form.cleaned_data
@@ -417,41 +419,13 @@ def OrderUpdate(request, pk):
                         ingredient_name = ingredient.ingredient.name
                         ingredient_quantity_per_dish = ingredient.ingredientQuantity
                         dish_quantity = new_form_data['dishQuantity']
-                        
                         total_new_quantity_requirement = ingredient_quantity_per_dish * dish_quantity
 
-                        if ingredient_name not in existing_ingredientDICT.keys():
-                            total_existing_quantity_requirement = 0
-                        else:    
-                            total_existing_quantity_requirement = existing_ingredientDICT[ingredient_name]
+                        if ingredient_name in new_ingredientDICT.keys():
+                            new_ingredientDICT[ingredient_name] = new_ingredientDICT[ingredient_name] + total_new_quantity_requirement
+                        else:
+                            new_ingredientDICT[ingredient_name] = total_new_quantity_requirement
 
-                        diff_quantity_requirement = total_new_quantity_requirement - total_existing_quantity_requirement
-                        
-                        print(ingredient_name)
-                        print('existing quantity req is:')
-                        print(total_existing_quantity_requirement)
-                        print('new quantity req is:')                       
-                        print(total_new_quantity_requirement)                        
-                        print('diff quantity req is:')
-                        print(diff_quantity_requirement)
-                        print()
-
-                        # if ingredient_name in new_ingredientDICT.keys():
-                        #     new_ingredientDICT[ingredient_name] = new_ingredientDICT[ingredient_name] + total_new_quantity_requirement
-                        # else:
-                        #     new_ingredientDICT[ingredient_name] = total_new_quantity_requirement
-
-                        # run validation logic - error message list populated if not enough inventory is available
-                        ingredient_object_to_check = Ingredient.objects.get(name=ingredient_name)
-                        current_quantity = ingredient_object_to_check.inventoryQuantity
-                        unit = ingredient_object_to_check.unitType
-                        
-                        if diff_quantity_requirement > 0:
-                            if current_quantity < diff_quantity_requirement:
-                                error = True
-                                error_message = f'Not enough inventory. You have {current_quantity} {unit} of {ingredient_name} left.'
-                                error_messages[dish_name] = error_message
-            
             print('new_dishLIST is:')
             print(new_dishLIST)
             print()
@@ -459,56 +433,96 @@ def OrderUpdate(request, pk):
             print('new_ingredientDICT is:')
             pprint(new_ingredientDICT)
             print()
-
-            # # run diff logic
-            # diff_dishLIST = []
-            # diff_ingredientDICT = {}
-
-            # for new_dish in new_dishLIST:
-            #     if new_dish not in existing_dishLIST:
-            #         diff_dishLIST.append(new_dish)
-
-            # # loop through each updated form ingredient
-            # for new_ingredient in new_ingredientDICT.keys():
-            #     if new_ingredient not in existing_ingredientDICT.keys(): # if its a brand new ingredient, just append it to the diffDICT
-            #         diff_ingredientDICT[new_ingredient] = new_ingredientDICT[new_ingredient]
-            #     else: # otherwise calc the difference between the updated quantity and the existing quantity
-            #         diff_ingredientDICT[new_ingredient] = new_ingredientDICT[new_ingredient] - existing_ingredientDICT[new_ingredient]
             
-            # print('diff_dishLIST is: ')
-            # print(diff_dishLIST)
-            # print()
-            
-            # print('diff_ingredientDICT is:')
-            # pprint(diff_ingredientDICT)
-            # print()
+            '''
+            TODO FIX diff_dishLIST - impacted dishes not populating to list
+            '''
+            # generate diff objects based on updated order
+            for new_dish in new_dishLIST:
+                if new_dish not in existing_dishLIST:
+                    diff_dishLIST.append(new_dish)
 
-            # # run validation logic
-            # for ingredient_diff in diff_ingredientDICT.keys():
-            #     diff_quantity = diff_ingredientDICT[ingredient_diff]
-            #     if diff_quantity > 0:
-            #         ingredient_object_to_check = Ingredient.objects.get(name=ingredient_diff)
-            #         ingredient_name = ingredient_object_to_check.name
-            #         current_quantity = ingredient_object_to_check.inventoryQuantity
-            #         unit = ingredient_object_to_check.unitType
+            # loop through each updated form ingredient
+            for new_ingredient in new_ingredientDICT.keys():
+                if new_ingredient not in existing_ingredientDICT.keys(): # if its a brand new ingredient, just append it to the diffDICT
+                    diff_ingredientDICT[new_ingredient] = new_ingredientDICT[new_ingredient]
+                else: # otherwise calc the difference between the updated quantity and the existing quantity
+                    diff_ingredientDICT[new_ingredient] = new_ingredientDICT[new_ingredient] - existing_ingredientDICT[new_ingredient]
             
-            #         if current_quantity < diff_quantity:
-            #             error = True
-            #             error_message = f'Not enough inventory to make this change. You have {current_quantity} {unit} of {ingredient_name} left.'
-            #             error_messages[dish_name] = error_message
+            print('diff_dishLIST is: ')
+            print(diff_dishLIST)
+            print()
+            
+            print('diff_ingredientDICT is:')
+            pprint(diff_ingredientDICT)
+            print()
 
-            print('ERROR LIST:')
-            pprint(error_messages)
+            # run order level diff validation logic
+            for ingredient_diff in diff_ingredientDICT.keys():
+                diff_quantity = diff_ingredientDICT[ingredient_diff]
+                if diff_quantity > 0:
+                    ingredient_object_to_check = Ingredient.objects.get(name=ingredient_diff)
+                    ingredient_name = ingredient_object_to_check.name
+                    current_quantity = float(ingredient_object_to_check.inventoryQuantity)
+                    unit = ingredient_object_to_check.unitType
+            
+                    if current_quantity < diff_quantity:
+                        error = True
+                        error_messages_order_level[ingredient_name] = {}
+                        error_messages_order_level[ingredient_name][current_quantity] = unit
+
+            print('ORDER LEVEL ERROR LIST:')
+            pprint(error_messages_order_level)
+            print()
+
+            for f in formset:
+                formData = f.cleaned_data
+                if formData['DELETE'] == False:
+                    dish = formData['menuItem']
+                    dish_name = dish.name
+                    menuItem = MenuItem.objects.get(name=dish)
+                    for ingredient in IngredientQuantity.objects.filter(menuItem=menuItem): 
+                        ingredient_name = ingredient.ingredient.name
+                        
+                        if ingredient_name in error_messages_order_level.keys():
+                            ingredient_quantity_per_dish = ingredient.ingredientQuantity
+                            dish_quantity = formData['dishQuantity']
+                            required_quantity = ingredient_quantity_per_dish * dish_quantity
+                            unit = ingredient.ingredient.unitType
+
+                            '''# make sure dish isn't already in the error list or dishes will multiple errors will be overwritten, 
+                            and only one ingredient error will be assigned to the dish'''
+                            if dish_name not in error_messages_dish_level.keys(): 
+                                error_messages_dish_level[dish_name] = {}
+                            
+                            error_messages_dish_level[dish_name][ingredient_name] = {}
+                            error_messages_dish_level[dish_name][ingredient_name][required_quantity] = unit
+
+            print('DISH LEVEL ERROR LIST:')
+            pprint(error_messages_dish_level)
+            print()
 
             # check if error triggered, and update DB and redirect
+            if not error:
+                for ingredient in diff_ingredientDICT.keys(): # loop through the ingredients themselves to gather what we need to adjust the DB
+                    ingredient_to_adjust = Ingredient.objects.get(name=ingredient)
+                    ingredient_to_adjust.inventoryQuantity -= diff_ingredientDICT[ingredient]
+                    ingredient_to_adjust.save()
+                formset.save()
+                return redirect('orderlist')
 
-
-
-
-            formset.save()
-            return redirect('orderlist')
-    
-    context = {'order': order, 'form': form, 'formset': formset}
+    diff_dishLIST = json.dumps(diff_dishLIST)
+    error_messages_order_level = json.dumps(error_messages_order_level)
+    error_messages_dish_level = json.dumps(error_messages_dish_level)    
+    context = {
+        'order': order,
+        'form': form,
+        'formset': formset,
+        'error': error,
+        'diff_dishLIST': diff_dishLIST,
+        'error_messages_order_level': error_messages_order_level,
+        'error_messages_dish_level': error_messages_dish_level
+    }
     return render(request, 'inventory/orderEdit.html', context)
 
 @login_required(login_url='login')
