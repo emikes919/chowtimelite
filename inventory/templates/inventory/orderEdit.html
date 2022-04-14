@@ -81,9 +81,9 @@
     addMoreBtn.addEventListener('click', addNewForm)
     const totalNewForms = document.getElementById('id_dishquantity_set-TOTAL_FORMS')
     
-    let diff_dishLIST = JSON.parse("{{ diff_dishLIST|escapejs }}")
-    console.log('diff_dishLIST: ')
-    console.log(diff_dishLIST)
+    let new_dishLIST = JSON.parse("{{ new_dishLIST|escapejs }}")
+    console.log('new_dishLIST: ')
+    console.log(new_dishLIST)
     
     let ingredient_error_list = JSON.parse("{{ error_messages_order_level|escapejs }}")
     console.log('ORDER LEVEL ERROR LIST:')
@@ -119,10 +119,10 @@
         let errorMessageUL = document.getElementById('order-level-error-message-list')
         
         for (let [ingredient, data] of Object.entries(ingredient_error_list)) {
-            let quantity = Object.keys(data)
+            let quantity = Object.keys(data)[0]
             let unit = data[quantity]
-            errorMessageUL.innerHTML = errorMessageUL.innerHTML + `<li>${ingredient}: ${quantity} ${unit} remaining</li>`
-            }
+            errorMessageUL.innerHTML = errorMessageUL.innerHTML + `<li>${ingredient}: ${quantity} ${unit.toLowerCase()} remaining</li>`
+        }
      
         if (error == 'True') {
             errorMessageDiv.style.display = 'block'
@@ -131,24 +131,36 @@
     }
 
     function displayDishLevelErrorMessage () {     
-        let diff_dishLIST = JSON.parse("{{ diff_dishLIST|escapejs }}")
+        let new_dishLIST = JSON.parse("{{ new_dishLIST|escapejs }}")
         let dish_level_ingredient_requirements = JSON.parse("{{ error_messages_dish_level|escapejs }}")
-        let dish_error_list = Object.keys(dish_level_ingredient_requirements)
 
-        for (let i = 0; i < diff_dishLIST.length; i++) {
-            let dish = diff_dishLIST[i]
-            if (dish_error_list.includes(dish)) {
-                errorMessage = ''
-
-                for (let [ingredient, data] of Object.entries(dish_level_ingredient_requirements[dish])) {
-                    let quantity = Object.keys(data)
-                    let unit = data[quantity]
-                    errorMessage += `${quantity} ${unit} ${ingredient} required`
-                }
+        for (let i = 0; i < new_dishLIST.length; i++) {
+            if (dish_level_ingredient_requirements[i] != {}) {
                 
+                let errorMessage = []
+                for (let [ingredient, data] of Object.entries(dish_level_ingredient_requirements[i])) {
+                    let quantity = Object.keys(data)[0]
+                    let unit = data[quantity]
+                    errorMessage.push(`${quantity} ${unit.toLowerCase()} ${ingredient.toLowerCase()} required`)
+                }
+    
+                errorMessage = errorMessage.join('; ')
+    
                 let errorMessageDiv = document.getElementById(`error-message-${i}`)
                 errorMessageDiv.innerHTML = errorMessageDiv.innerHTML + errorMessage
             }
+
+            // if (dish_error_list.includes(dish)) {
+
+            //     for (let [ingredient, data] of Object.entries(dish_level_ingredient_requirements[dish])) {
+            //         let quantity = Object.keys(data)
+            //         let unit = data[quantity]
+            //         errorMessage += `${quantity} ${unit} ${ingredient} required`
+            //     }
+                
+            //     let errorMessageDiv = document.getElementById(`error-message-${i}`)
+            //     errorMessageDiv.innerHTML = errorMessageDiv.innerHTML + errorMessage
+            // }
         }
     }
 

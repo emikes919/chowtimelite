@@ -406,12 +406,20 @@ def OrderUpdate(request, pk):
                 dish = new_form_data['menuItem']
                 dish_name = dish.name
                 new_dishLIST.append(dish_name) # make a list of each dish name in the order
+                menuItem = MenuItem.objects.get(name=dish) # grab the MenuItem DB object based on menuItem in form
                 
-                '''## TODO build in if ['DELETE'] == TRUE, need to add those ingredients back to the DB'''
+                if new_form_data['DELETE'] == True:
+                    for ingredient in IngredientQuantity.objects.filter(menuItem=menuItem):
+                        ingredient_quantity_per_deleted_dish = ingredient.ingredientQuantity
+                        deleted_dish_quantity = new_form_data['dishQuantity']
+                        total_quantity_to_add_back = ingredient_quantity_per_deleted_dish * deleted_dish_quantity
+
+                        # add total quantity of each ingredient back to the database
+                        ingredient_object_to_add = Ingredient.objects.get(name=ingredient.ingredient.name)
+                        ingredient_object_to_add.inventoryQuantity += total_quantity_to_add_back
+                        ingredient_object_to_add.save()
 
                 if new_form_data['DELETE'] == False:
-                    menuItem = MenuItem.objects.get(name=dish) # grab the MenuItem DB object based on menuItem in form
-                    
                     # loop through ingredients in that MenuItem to populate blank dict
                     for ingredient in IngredientQuantity.objects.filter(menuItem=menuItem): 
                         
@@ -433,14 +441,6 @@ def OrderUpdate(request, pk):
             print('new_ingredientDICT is:')
             pprint(new_ingredientDICT)
             print()
-            
-            '''
-            TODO FIX diff_dishLIST - impacted dishes not populating to list
-            '''
-            # generate diff objects based on updated order
-            for new_dish in new_dishLIST:
-                if new_dish not in existing_dishLIST:
-                    diff_dishLIST.append(new_dish)
 
             # loop through each updated form ingredient
             for new_ingredient in new_ingredientDICT.keys():
@@ -475,12 +475,15 @@ def OrderUpdate(request, pk):
             pprint(error_messages_order_level)
             print()
 
-            for f in formset:
+            for i in range(0, len(formset)):
+                f = formset[i]
                 formData = f.cleaned_data
                 if formData['DELETE'] == False:
                     dish = formData['menuItem']
+                    dish_id = i
                     dish_name = dish.name
                     menuItem = MenuItem.objects.get(name=dish)
+                    dish_ingredientsDICT = {}
                     for ingredient in IngredientQuantity.objects.filter(menuItem=menuItem): 
                         ingredient_name = ingredient.ingredient.name
                         
@@ -490,13 +493,10 @@ def OrderUpdate(request, pk):
                             required_quantity = ingredient_quantity_per_dish * dish_quantity
                             unit = ingredient.ingredient.unitType
 
-                            '''# make sure dish isn't already in the error list or dishes will multiple errors will be overwritten, 
-                            and only one ingredient error will be assigned to the dish'''
-                            if dish_name not in error_messages_dish_level.keys(): 
-                                error_messages_dish_level[dish_name] = {}
+                            dish_ingredientsDICT[ingredient_name] = {}
+                            dish_ingredientsDICT[ingredient_name][required_quantity] = unit
                             
-                            error_messages_dish_level[dish_name][ingredient_name] = {}
-                            error_messages_dish_level[dish_name][ingredient_name][required_quantity] = unit
+                    error_messages_dish_level[dish_id] = dish_ingredientsDICT
 
             print('DISH LEVEL ERROR LIST:')
             pprint(error_messages_dish_level)
@@ -511,6 +511,7 @@ def OrderUpdate(request, pk):
                 formset.save()
                 return redirect('orderlist')
 
+    new_dishLIST = json.dumps(new_dishLIST)
     diff_dishLIST = json.dumps(diff_dishLIST)
     error_messages_order_level = json.dumps(error_messages_order_level)
     error_messages_dish_level = json.dumps(error_messages_dish_level)    
@@ -519,6 +520,7 @@ def OrderUpdate(request, pk):
         'form': form,
         'formset': formset,
         'error': error,
+        'new_dishLIST': new_dishLIST,
         'diff_dishLIST': diff_dishLIST,
         'error_messages_order_level': error_messages_order_level,
         'error_messages_dish_level': error_messages_dish_level
@@ -528,7 +530,36 @@ def OrderUpdate(request, pk):
 @login_required(login_url='login')
 def OrderDelete(request, pk):
     order = Order.objects.get(id=pk)
+    ingredientDICT = {}
+    error = False
+    error_messages_order_level = {}
+    
     if request.method == 'POST':
+
+        for dish in DishQuantity.objects.filter(order=order):
+            dish_name = dish.menuItem.name
+            menuItem = MenuItem.objects.get(name=dish_name)
+
+            for ingredientQuantity_object in IngredientQuantity.objects.filter(menuItem=menuItem):
+                name = ingredientQuantity_object.ingredient.name
+                ingredient_quantity_per_dish = ingredientQuantity_object.ingredientQuantity
+                dish_quantity = dish.dishQuantity
+                total_quantity_to_delete = ingredient_quantity_per_dish * dish_quantity
+                
+                if name in ingredientDICT.keys():
+                    ingredientDICT[name] = ingredientDICT[name] + total_quantity_to_delete
+                else:
+                    ingredientDICT[name] = total_quantity_to_delete
+            
+        print('ingredientDICT is:')
+        pprint(ingredientDICT)
+        print()
+
+        for ingredient in ingredientDICT.keys():
+            ingredient_object_to_adjust = Ingredient.objects.get(name=ingredient)
+            ingredient_object_to_adjust.inventoryQuantity += ingredientDICT[ingredient]
+            ingredient_object_to_adjust.save()
+            
         order.delete()
         return redirect('orderlist')
     
