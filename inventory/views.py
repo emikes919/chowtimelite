@@ -175,26 +175,74 @@ def ItemUpdate(request, pk):
     IngredientQuantityFormset = inlineformset_factory(
         MenuItem, IngredientQuantity, fields=('ingredient', 'ingredientQuantity'), can_delete=True, extra=0
     )
+
     formset = IngredientQuantityFormset(instance=item)
     form = ItemCreateForm(instance=item)
+
+    ingredientLIST = []
+    errorLIST = []
+    error = False
 
     if request.method == 'POST':
         pprint('request.POST :')
         pprint(request.POST)
         form = ItemCreateForm(request.POST, instance=item)
         formset = IngredientQuantityFormset(request.POST, instance=item)
+        
         print('form valid?')
         print(form.is_valid())
         print('formset valid')
         print(formset.is_valid())
         print('formset errors')
         print(formset.errors)
-        if (form.is_valid() and formset.is_valid()):
+        
+        if form.is_valid():
             form.save()
-            formset.save()
-            return redirect('menuview', item.menu.id)
+
+        if formset.is_valid():
+            for f in formset:
+                formData = f.cleaned_data # grab underlying data from the form
+                print('formData is: ')
+                print(formData)
+                print()
+
+                if formData['DELETE'] == False:
+                    ingredient = formData['ingredient']
+                    ingredient_name = ingredient.name
+                    ingredientLIST.append(ingredient_name)
+
+            print('ingredientLIST')
+            print(ingredientLIST)
+            print()
+
+            # run duplicate ingredient validation
+            for i in ingredientLIST:
+                count = ingredientLIST.count(i)
+                if count > 1:
+                    error = True
+                    if i not in errorLIST:
+                        errorLIST.append(i)
+            
+            print('error:')
+            print(error)
+            print()
+
+            print('errorLIST:')
+            print(errorLIST)
+            print()
+
+            if not error:
+                formset.save()
+                return redirect('menuview', item.menu.id)
     
-    context = {'form': form, 'formset': formset, 'item': item}
+    errorLIST = json.dumps(errorLIST)
+    context = {
+        'form': form,
+        'formset': formset,
+        'item': item,
+        'error': error,
+        'errorLIST': errorLIST
+    }
     return render(request, 'inventory/itemEdit.html', context)
 
 @login_required(login_url='login')

@@ -15,8 +15,12 @@
     <form method="POST" action="">
         {% csrf_token %}
         {{form.as_p}}
-        <br>
         
+        <div id="error-message-div" style="display: none">
+            <p>You may not create a dish with two instances of the same ingredient.<br>Please adjust your ingredients such that this dish contains only one of each of the following:</p>
+            <ul id="error-message-list"></ul>
+        </div>
+
         <table id="ingredient-heading">
             <thead>
                 <tr>
@@ -68,6 +72,36 @@
 
     itemizeIngredientForms()
     removeBtnListener()
+    hideDeletedFormsOnRender()
+    displayErrorMessage()
+
+    function hideDeletedFormsOnRender () {
+        let ingredientforms = document.getElementsByClassName('ingredient-form')
+
+        for (i = 0; i < ingredientforms.length; i++) {
+            deleteCheckbox = document.getElementById(`id_ingredientquantity_set-${i}-DELETE`)
+            if (deleteCheckbox.checked == true) {
+                let ingredientFormToHide = document.getElementById(`ingredient-form-${i}`)
+                ingredientFormToHide.style.display = 'none'
+            }
+        }
+    }
+
+    function displayErrorMessage() {       
+        let error = "{{ error }}"
+        let errorLIST = JSON.parse("{{ errorLIST|escapejs }}")
+        let errorMessageDiv = document.getElementById('error-message-div')
+        let errorMessageUL = document.getElementById('error-message-list')
+        
+        if (error == 'True') {
+            for (i = 0; i < errorLIST.length; i++) {
+                errorMessageUL.innerHTML = errorMessageUL.innerHTML + `<li>${errorLIST[i]}</li>`
+            } 
+            
+            errorMessageDiv.style.display = 'block'
+            errorMessageDiv.style.color = 'red'
+        }
+    }
 
     function itemizeIngredientForms () {
         let ingredientForms = document.getElementsByClassName('ingredient-form')
