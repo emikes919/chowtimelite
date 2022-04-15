@@ -5,7 +5,10 @@
 <div>
     <form method="POST" action="">
         {% csrf_token %}
-        {{form.as_p}}
+        <p>
+            {{ form.name.label }}:
+            {{ form.name }}
+        </p>
         <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
         <input type="submit" value="Submit"/>
         <button style="background-color: darkred; color: white" type="button"><a href="{% url 'menudelete' menu.id %}">Delete</a></button>

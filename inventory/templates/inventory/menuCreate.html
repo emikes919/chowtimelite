@@ -4,7 +4,10 @@
 
 <form method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
+    <p>
+        {{ form.name.label }}:
+        {{ form.name }}
+    </p>
     <input type="submit" value="Submit"/>
 </form>
 

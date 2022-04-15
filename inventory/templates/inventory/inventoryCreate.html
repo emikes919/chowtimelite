@@ -5,7 +5,23 @@
 <div>
     <form method="POST" action="">
         {% csrf_token %}
-        {{form.as_p}}
+        <br>
+        {{form.name.label}}
+        {{form.name}}
+        <br>
+        <br>
+        {{form.unitType.label}}
+        {{form.unitType}}
+        <br>
+        <br>
+        {{form.unitCost.label}}
+        {{form.unitCost}}
+        <br>
+        <br>
+        {{form.inventoryQuantity.label}}
+        {{form.inventoryQuantity}}
+        <br>
+        <br>
         <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
         <input type="submit" value="Submit"/>
     </form>

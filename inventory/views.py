@@ -3,6 +3,7 @@ from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from pprint import pprint
@@ -59,7 +60,8 @@ def Home(request):
 
 @login_required(login_url='login')
 def InventoryList(request):
-    inventory = Ingredient.objects.all()
+    user = request.user
+    inventory = Ingredient.objects.filter(user=user)
     context = {'inventory': inventory}
     return render(request, 'inventory/inventoryList.html', context)
 
@@ -70,7 +72,9 @@ def InventoryCreate(request):
     if request.method == 'POST':
         form = InventoryCreateForm(request.POST)
         if form.is_valid():
-            form.save()
+            ingredient = form.save(commit=False)
+            ingredient.user = request.user
+            ingredient.save()
             return redirect('inventorylist')
 
     context = {'form': form}
@@ -79,12 +83,16 @@ def InventoryCreate(request):
 @login_required(login_url='login')
 def InventoryUpdate(request, pk):
     inventory = Ingredient.objects.get(id=pk)
+    print('inventory.user')
+    print(inventory.user)
     form = InventoryCreateForm(instance=inventory)
 
     if request.method == 'POST':
         form = InventoryCreateForm(request.POST, instance=inventory)
         if form.is_valid():
-            form.save()
+            inventory = form.save(commit=False)
+            inventory.user = request.user
+            inventory.save()
             return redirect('inventorylist')
     
     context = {'form': form, 'inventory': inventory}
@@ -101,7 +109,8 @@ def InventoryDelete(request, pk):
 
 @login_required(login_url='login')
 def MenuList(request):
-    menus = Menu.objects.all()
+    user = request.user
+    menus = Menu.objects.filter(user=user)
     context = {'menus': menus}
     return render(request, 'inventory/menuList.html', context)
 
@@ -112,7 +121,9 @@ def MenuCreate(request):
     if request.method == 'POST':
         form = MenuCreateForm(request.POST)
         if form.is_valid():
-            form.save()
+            menu = form.save(commit=False)
+            menu.user = request.user
+            menu.save()
             return redirect('menulist')
     
     context = {'form': form}
@@ -133,7 +144,9 @@ def MenuUpdate(request, pk):
     if request.method == 'POST':
         form = MenuCreateForm(request.POST, instance=menu)
         if form.is_valid():
-            form.save()
+            menu = form.save(commit=False)
+            menu.user = request.user
+            menu.save()
             return redirect('menulist')
     
     context = {'form': form, 'menu': menu}
@@ -171,6 +184,9 @@ def ItemCreate(request, pk):
 @login_required(login_url='login')
 def ItemUpdate(request, pk):
     item = MenuItem.objects.get(id=pk)
+    user = request.user
+    print('user')
+    print(user)
 
     IngredientQuantityFormset = inlineformset_factory(
         MenuItem, IngredientQuantity, fields=('ingredient', 'ingredientQuantity'), can_delete=True, extra=0
@@ -184,7 +200,7 @@ def ItemUpdate(request, pk):
     error = False
 
     if request.method == 'POST':
-        pprint('request.POST :')
+        pprint('request.POST:')
         pprint(request.POST)
         form = ItemCreateForm(request.POST, instance=item)
         formset = IngredientQuantityFormset(request.POST, instance=item)

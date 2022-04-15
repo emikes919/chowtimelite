@@ -15,7 +15,7 @@ class InventoryCreateForm(forms.ModelForm):
 class MenuCreateForm(forms.ModelForm):
     class Meta:
         model = Menu
-        fields = ['name']
+        fields = '__all__'
 
 class ItemCreateForm(forms.ModelForm):
     class Meta:

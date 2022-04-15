@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 import datetime
 
 class Ingredient(models.Model):
@@ -12,10 +13,16 @@ class Ingredient(models.Model):
         ('Pieces', 'Pieces')
     ]
 
+    '''
+    users: 
+    - on_delete=models.SET_NULL so if the user is deleted, the ingredient model instances aren't deleted as well 
+    - null=True since we already have database data and we couldn't migrate without having to add a default
+    '''
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True) 
     name = models.CharField(max_length=200)
-    unitType = models.CharField(max_length=200, choices=UNIT_CHOICES, default=PIECE)
-    unitCost = models.DecimalField(max_digits=10, decimal_places=2)
-    inventoryQuantity = models.DecimalField(max_digits=10, decimal_places=2)
+    unitType = models.CharField(max_length=200, choices=UNIT_CHOICES, verbose_name='Unit')
+    unitCost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Unit Cost')
+    inventoryQuantity = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Quantity')
     
     def __str__(self):
         return self.name + ' (' + self.unitType + ')'
@@ -25,6 +32,7 @@ class Ingredient(models.Model):
         return "{:.0f}".format(result)
 
 class Menu(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True) 
     name = models.CharField(max_length=200)
     timeCreated = models.DateTimeField(auto_now_add=True)
     timeUpdated = models.DateTimeField(auto_now=True)
@@ -51,6 +59,7 @@ class MenuItem(models.Model):
         return cost
 
 class IngredientQuantity(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     menuItem = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     ingredientQuantity = models.IntegerField(default=0)
@@ -59,6 +68,7 @@ class IngredientQuantity(models.Model):
         return str(self.ingredient)
 
 class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True) 
     menuItems = models.ManyToManyField(MenuItem, through='DishQuantity')
     timestamp = models.DateTimeField(auto_now_add=True)
     customer = models.CharField(max_length=200)
