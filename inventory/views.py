@@ -303,7 +303,9 @@ def OrderCreate(request):
         print(request.POST)
         form = OrderCreateForm(request.POST)
         if form.is_valid():
-            order = form.save()
+            order = form.save(commit=False)
+            order.user = request.user
+            order.save()
             formset = DishQuantityFormset(request.POST, instance=order)
 
             if formset.is_valid():
@@ -632,7 +634,8 @@ def OrderDelete(request, pk):
 
 @login_required(login_url='login')
 def pnlView(request):
-    orders = Order.objects.all()
+    user = request.user
+    orders = Order.objects.filter(user=user)
     orderdict = {}
 
     # grab every unique date 
@@ -655,10 +658,12 @@ def pnlView(request):
     for orderdate in orderdict.keys():
         orderdict[orderdate]['revenue'] = getRevenueFromOrders(Order.objects.filter(timestamp__year=orderdate.year,
                                                                                     timestamp__month=orderdate.month,
-                                                                                    timestamp__day=orderdate.day))
+                                                                                    timestamp__day=orderdate.day,
+                                                                                    user=user))
         orderdict[orderdate]['COGS'] = getCOGSFromOrders(Order.objects.filter(timestamp__year=orderdate.year,
                                                                               timestamp__month=orderdate.month,
-                                                                              timestamp__day=orderdate.day))
+                                                                              timestamp__day=orderdate.day,
+                                                                              user=user))
         orderdict[orderdate]['GPdollar'] = orderdict[orderdate]['revenue'] - orderdict[orderdate]['COGS']
         orderdict[orderdate]['GPpct'] = '{:0.1%}'.format(orderdict[orderdate]['GPdollar'] / orderdict[orderdate]['revenue'])
 
@@ -671,7 +676,11 @@ def pnlView(request):
         totalCOGS += v['COGS']
 
     totalGPdollar = totalRevenue - totalCOGS
-    totalGPpct = '{:0.1%}'.format(totalGPdollar / totalRevenue)
+    
+    if totalRevenue == 0:
+        totalGPpct = 'n/a'
+    else:
+        totalGPpct = '{:0.1%}'.format(totalGPdollar / totalRevenue)
 
     pprint(orderdict)
 
