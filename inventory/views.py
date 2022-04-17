@@ -192,8 +192,8 @@ def ItemUpdate(request, pk):
         MenuItem, IngredientQuantity, fields=('ingredient', 'ingredientQuantity'), can_delete=True, extra=0
     )
 
-    formset = IngredientQuantityFormset(instance=item)
     form = ItemCreateForm(instance=item)
+    formset = IngredientQuantityFormset(instance=item)
 
     ingredientLIST = []
     errorLIST = []
@@ -273,7 +273,8 @@ def ItemDelete(request, pk):
 
 @login_required(login_url='login')
 def OrderList(request):
-    orders = Order.objects.all()
+    user = request.user
+    orders = Order.objects.filter(user=user)
     totalRevenue = 0
 
     for order in orders:

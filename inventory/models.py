@@ -23,7 +23,7 @@ class Ingredient(models.Model):
     unitType = models.CharField(max_length=200, choices=UNIT_CHOICES, verbose_name='Unit')
     unitCost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Unit Cost')
     inventoryQuantity = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Quantity')
-    
+
     def __str__(self):
         return self.name + ' (' + self.unitType + ')'
 
@@ -59,7 +59,6 @@ class MenuItem(models.Model):
         return cost
 
 class IngredientQuantity(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     menuItem = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     ingredientQuantity = models.IntegerField(default=0)
