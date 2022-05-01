@@ -41,6 +41,7 @@ class Menu(models.Model):
         return str(self.name)
 
 class MenuItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     ingredients = models.ManyToManyField(Ingredient, through='IngredientQuantity')

@@ -10,7 +10,7 @@ from pprint import pprint
 import json
 
 from .models import Ingredient, IngredientQuantity, MenuItem, Menu, Order, DishQuantity
-from .forms import InventoryCreateForm, MenuCreateForm, ItemCreateForm, OrderCreateForm, CreateUserForm
+from .forms import InventoryCreateForm, MenuCreateForm, ItemCreateForm, OrderCreateForm, CreateUserForm, IngredientQuantityFormset, DishQuantityFormset
 
 def landingPage(request):
     return render(request, 'inventory/landingPage.html')
@@ -174,6 +174,7 @@ def ItemCreate(request, pk):
         if form.is_valid():
             item = form.save(commit=False)
             item.menu = menu
+            item.user = request.user
             item.save()
             # form.save_m2m()
             return redirect('menuview', menu.id)
@@ -188,12 +189,8 @@ def ItemUpdate(request, pk):
     print('user')
     print(user)
 
-    IngredientQuantityFormset = inlineformset_factory(
-        MenuItem, IngredientQuantity, fields=('ingredient', 'ingredientQuantity'), can_delete=True, extra=0
-    )
-
     form = ItemCreateForm(instance=item)
-    formset = IngredientQuantityFormset(instance=item)
+    formset = IngredientQuantityFormset(instance=item, form_kwargs={'user': request.user})
 
     ingredientLIST = []
     errorLIST = []
@@ -203,7 +200,7 @@ def ItemUpdate(request, pk):
         pprint('request.POST:')
         pprint(request.POST)
         form = ItemCreateForm(request.POST, instance=item)
-        formset = IngredientQuantityFormset(request.POST, instance=item)
+        formset = IngredientQuantityFormset(request.POST, instance=item, form_kwargs={'user': request.user})
         
         print('form valid?')
         print(form.is_valid())
@@ -285,13 +282,9 @@ def OrderList(request):
 
 @login_required(login_url='login')
 def OrderCreate(request):
-    DishQuantityFormset = inlineformset_factory(
-        Order, DishQuantity, fields=('menuItem', 'dishQuantity'), can_delete=True, extra=0
-    )
-    
     form = OrderCreateForm
-    formset = DishQuantityFormset()
-    
+    formset = DishQuantityFormset(form_kwargs={'user': request.user})
+
     error = False
     error_messages_order_level = {}
     error_messages_dish_level = {}
@@ -306,7 +299,7 @@ def OrderCreate(request):
             order = form.save(commit=False)
             order.user = request.user
             order.save()
-            formset = DishQuantityFormset(request.POST, instance=order)
+            formset = DishQuantityFormset(request.POST, instance=order, form_kwargs={'user': request.user})
 
             if formset.is_valid():
                 for f in formset:
@@ -412,12 +405,9 @@ def OrderCreate(request):
 @login_required(login_url='login')
 def OrderUpdate(request, pk):
     order = Order.objects.get(id=pk)
-    DishQuantityFormset = inlineformset_factory(
-        Order, DishQuantity, fields=('menuItem', 'dishQuantity'), can_delete=True, extra=0
-    )
     
     form = OrderCreateForm(instance=order)
-    formset = DishQuantityFormset(instance=order)
+    formset = DishQuantityFormset(instance=order, form_kwargs={'user': request.user})
     
     # grab ingredient data from existing order
     existing_dishLIST = []
@@ -459,7 +449,7 @@ def OrderUpdate(request, pk):
     
     if request.method == 'POST':
         form = OrderCreateForm(request.POST, instance=order)
-        formset = DishQuantityFormset(request.POST, instance=order)
+        formset = DishQuantityFormset(request.POST, instance=order, form_kwargs={'user': request.user})
 
         if form.is_valid() and formset.is_valid():
             form.save()

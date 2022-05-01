@@ -2,37 +2,58 @@
 
 {% block content %}
 
-<h2>Inventory</h2>
+<style>
+    /* .section-body{
+        display: flex;
+        justify-content: center;
+    } */
+    .table{
+        height: auto;
+        margin-top: auto;
+        margin-bottom: auto;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Roboto;
+        text-align: center;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+    }
+</style>
 
-<div>
-    
+
+<div class="section-body">
+    <div>
+        <h2>Inventory</h2>
+    </div class="section-table-card">
     {% if inventory != '' %}
-        <table>
-            <thead>
-                <th style="text-align: left">Name</th>
-                <th style="text-align: right">Stock</th>
-                <th style="text-align: right">Units</th>
-                <th style="text-align: right">Unit Cost</th>
-                <th style="text-align: right">Total Cost</th>
-            </thead>
-            <tbody>
-            {% for item in inventory %}
-                <tr>
-                    <td style="text-align: left">{{ item.name }}</td>
-                    <td style="text-align: right">{{ item.inventoryQuantity }}</td>
-                    <td style="text-align: right">{{ item.unitType }}</td>
-                    <td style="text-align: right">{{ item.unitCost }}</td>
-                    <td style="text-align: right">{{ item.totalCost }}</td>
-                    <td style="text-align: right"><a href="{% url 'inventoryupdate' item.id %}">Edit</a></td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <div class="table">
+            <table>
+                <thead>
+                    <th style="text-align: left">Name</th>
+                    <th style="text-align: right">Stock</th>
+                    <th style="text-align: right">Units</th>
+                    <th style="text-align: right">Unit Cost</th>
+                    <th style="text-align: right">Total Cost</th>
+                </thead>
+                <tbody>
+                {% for item in inventory %}
+                    <tr>
+                        <td style="text-align: left">{{ item.name }}</td>
+                        <td style="text-align: right">{{ item.inventoryQuantity }}</td>
+                        <td style="text-align: right">{{ item.unitType }}</td>
+                        <td style="text-align: right">{{ item.unitCost }}</td>
+                        <td style="text-align: right">{{ item.totalCost }}</td>
+                        <td style="text-align: right"><a href="{% url 'inventoryupdate' item.id %}">Edit</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% endif %}
-    
-    
     <button style="background-color: darkgrey;" type="button"><a href="{% url 'inventorycreate' %}">Add an item</a></button>
-
 </div>
 
 

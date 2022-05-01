@@ -1,23 +1,122 @@
 <!DOCTYPE html>
 <html>
+    
+    <style>
+    :root{
+        --primary: #5B89FF;
+        --background-grey: #ECECEC;
+    }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Roboto';
+    }
+
+    body {
+        background-color: var(--background-grey);
+        padding-top: 90px;
+        padding-left: 18px;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+    .container{
+        max-width: 6000px;
+        margin: 0 auto;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    nav{
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 99;
+        background-color: var(--primary);
+        padding: 20px 18px;
+        /* border-bottom: 3px solid white; */
+        box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.25);
+    }
+    h1{
+        color: #FFF;
+        text-decoration: none;
+        font-size: 28px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        
+    }
+    a{
+        color: #FFF;
+        text-decoration: none;
+    }
+    .menu{
+        display: none;
+        flex: 1 1 0%;
+        justify-content: flex-end;
+        margin-left: 30px;
+    }
+    .menu a{
+        color: white;
+        margin: 0 4px;
+        transition: 0.4s;
+        padding: 8px 16px;
+        border-radius: 99px;
+    }
+    .menu a.is-active, .menu a:hover{
+        background-color: white;
+        color: var(--primary)
+    }
+    .logout {
+        display: none;
+        color: white;
+    }
+    .logout a{
+        font-weight:600;
+    }
+    @media (min-width: 825px) {
+        .hamburger {
+            display: none;
+        }
+        .menu{
+            display: block;
+        }
+        .logout{
+            display: block;
+        }
+    }
+    </style>    
+
+    <script>
+        $('a').click(function(){
+            $(this).removeClass('is-active');
+            $(this).addClass('is-active');
+        });
+    </script>
+
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE-edge">
         <title>Chowtime! Lite</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css"> -->
-
-        <h1><a href="{% url 'home' %}">Chowtime! Lite</a></h1>
-        <div>
-            <table>
-                <th>
-                    <td><a href="{% url 'inventorylist' %}">Inventory</a></td>
-                    <td><a href="{% url 'menulist' %}">Menus</a></td>
-                    <td><a href="{% url 'orderlist' %}">Orders</a></td>
-                    <td><a href="{% url 'logout' %}">Logout</a> {{ request.user }}</td>
-                </th>
-            </table>
-        </div>
+        <nav>
+            <div class="container">
+                <h1><a href="{% url 'pnlview' %}">Chowtime! Lite</a></h1>
+    
+                <div class="menu">
+                    <a href="{% url 'pnlview' %}">Overview</a>
+                    <a href="{% url 'inventorylist' %}">Inventory</a>
+                    <a href="{% url 'menulist' %}">Menus</a>
+                    <a href="{% url 'orderlist' %}">Orders</a>
+                </div>
+                
+                <div class="logout">
+                    {{ request.user }}, <a href="{% url 'logout' %}">Logout</a>
+                </div>
+            </div>
+        </nav>
     </head>
     <body>
         {% block content %}
