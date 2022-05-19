@@ -2,23 +2,35 @@
 
 {% block content %}
 
-<h2>Menus</h2>
-
-<div>
-    <table>
-        <tbody>
-            {% for menu in menus %}
-                <tr>
-                    <td><a href="{% url 'menuview' menu.id %}">{{menu.name}}</a></td>
-                    <td><a href="{% url 'menuupdate' menu.id %}">Edit</a></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <br>
-    <br>
-    <button style="background-color: darkgrey;" type="button"><a href="{% url 'menucreate' %}">Add a menu</a></button>
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">Menus</div>
+        <div class="main-title-subtext">
+            <p>Create and manage multiple menus.</p>
+            <p>Dishes on your menus will only be available if you have enough required inventory.</p>
+        </div>
+    </div>
+    <div class="right-side">
+        <div class="menu-list-flex">
+            {% if count == 0 %}
+                <div class="menu-placeholder-text">You don't have any menus yet! Create your first one below.</div>
+            {% else %}
+                {% for menu in menus %}
+                    <div class="menu-flex">
+                        <div class="menu-flex-info">
+                            <div class="menu-flex-name"><strong><a href="{% url 'menuview' menu.id %}">{{menu.name}}</a></strong></div>
+                            <div class="menu-flex-time-container">
+                                <div class="menu-flex-time"><em>Created on {{menu.timeCreated}}</em></div>
+                                <div class="menu-flex-time"><em>Last updated on {{menu.timeUpdated}}</em></div>
+                            </div>
+                        </div>
+                        <button class="btn-edit-menu" onclick="location.href='{% url 'menuview' menu.id %}'">Edit</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <button class="btn-add-menu" onclick="location.href='{% url 'menucreate' %}'">Add a menu</button>
+        </div>
+    </div>
 </div>
-
 
 {% endblock %}

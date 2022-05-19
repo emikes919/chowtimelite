@@ -2,17 +2,30 @@
 
 {% block content %}
 
-<div>
-    <form method="POST" action="">
-        {% csrf_token %}
-        <p>
-            {{ form.name.label }}:
-            {{ form.name }}
-        </p>
-        <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
-        <input type="submit" value="Submit"/>
-        <button style="background-color: darkred; color: white" type="button"><a href="{% url 'menudelete' menu.id %}">Delete</a></button>
-    </form>
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">Menus</div>
+        <div class="main-title-subtext">
+            <p>Create and manage multiple menus.</p>
+            <p>Dishes on your menus will only be available if you have enough required inventory.</p>
+        </div>
+    </div>
+    <div class="right-side">
+        <form class="add-edit-form" method="POST" action="">
+            {% csrf_token %}
+            <div class="add-menu-form-fields">
+                <div class="add-edit-form-label">Name</div>
+                {{form.name}}
+            </div>
+            <div class="add-menu-form-btns">
+                <button class="add-edit-go-back-btn" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
+                <button class="add-edit-submit-btn" type="submit">Submit</button>
+            </div>
+            <button class="delete-btn" type="button" onclick="location.href='{% url 'menudelete' menu.id %}'">Delete Menu</button>
+        </form>
+    </div>
 </div>
+
+
 
 {% endblock %}

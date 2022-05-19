@@ -2,30 +2,34 @@
 
 {% block content %}
 
-<div>
-    <form method="POST" action="">
-        {% csrf_token %}
-        <br>
-        {{form.name.label}}
-        {{form.name}}
-        <br>
-        <br>
-        {{form.unitType.label}}
-        {{form.unitType}}
-        <br>
-        <br>
-        {{form.unitCost.label}}
-        {{form.unitCost}}
-        <br>
-        <br>
-        {{form.inventoryQuantity.label}}
-        {{form.inventoryQuantity}}
-        <br>
-        <br>
-        <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
-        <input type="submit" value="Submit"/>
-    </form>
-</div>
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">Add an item</div>
+        <div class="main-title-subtext">
+            <p>Add <em>new</em> inventory items here.</p>
+            <p>To edit an existing item, select the pencil icon at the end of each line item on the inventory home page.</p>
+        </div>
+    </div>
 
+    <div class="right-side">
+        <form class="add-edit-form" method="POST" action="">
+            {% csrf_token %}
+            <div class="add-edit-form-fields">
+                <div class="add-edit-form-label">Name</div>
+                {{form.name}}
+                <div class="add-edit-form-label">Unit</div>
+                {{form.unitType}}
+                <div class="add-edit-form-label">Unit Cost</div>
+                {{form.unitCost}}
+                <div class="add-edit-form-label">Quantity</div>
+                {{form.inventoryQuantity}}
+            </div>
+            <div class="add-edit-form-btns">
+                <button class="add-edit-go-back-btn" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
+                <button class="add-edit-submit-btn" type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 {% endblock %}

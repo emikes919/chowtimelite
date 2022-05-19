@@ -1,29 +1,37 @@
 {% extends 'inventory/header.html' %}
-
+{% load static %}
+{% load humanize %}
 {% block content %}
 
-<h2>{{menu.name}}</h2>
-
-<div>
-    <table>
-        <thead>
-            <th style="text-align: left">Item</th>
-            <th style="text-align: right">Price</th>
-        </thead>
-        <tbody>
-            {% for item in items %}
-                <tr>
-                    <td style="text-align: left">{{ item.name }}</td>
-                    <td style="text-align: right">{{ item.price }}</td>
-                    <td style="text-align: right"><a href="{% url 'itemupdate' item.id %}">Edit</a></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <br>
-    <br>
-    <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
-    <button style="background-color: darkgrey;" type="button"><a href="{% url 'itemcreate' menu.id %}">Add an item</a></button>
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">{{menu.name}}   <a href="{% url 'menuupdate' menu.id %}"><img class="edit-icon" src="{% static 'inventory/edit-icon.png' %}"></a></div>
+        <div class="main-title-subtext">
+            <p>Manage your menu here. Add items, then edit them to assign them the required ingredients.</p>
+        </div>
+        <div class="menu-view-btns">
+            <button class="menu-view-go-back-btn" type="button" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
+            <button class="delete-btn" type="button" onclick="location.href='{% url 'menudelete' menu.id %}'">Delete Menu</button>
+        </div>
+    </div>
+    <div class="right-side">
+        <div class="menu-item-grid">
+            <div class="menu-item-table-header-cell col-1 first-col">Item</div>
+            <div class="menu-item-table-header-cell col-2">Price</div>
+            <div class="menu-item-table-header-cell col-3 last-col">Edit</div>
+            {% if count == 0 %}
+                <div class="menu-item-placeholder-text">You don't have any menu items yet! Add your first item below.</div>
+            {% else %}
+                {% for item in items %}
+                    <div class="menu-item-table-row-cell col-1 first-col">{{item.name}}</div>
+                    <div class="menu-item-table-row-cell col-2">${{item.price|intcomma}}</div>
+                    <div class="menu-item-table-row-cell col-3 last-col"><a href="{% url 'itemupdate' item.id %}"><img class="edit-icon" src="{% static 'inventory/edit-icon.png' %}"></a></div>
+                    <div class="row-border-menu-item"></div>
+                {% endfor %}
+            {% endif %}
+            <button class="btn-add-menu-item" onclick="location.href='{% url 'itemcreate' menu.id %}'">Add an item</button>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

@@ -2,31 +2,35 @@
 
 {% block content %}
 
-<div>
-    <form method="POST" action="">
-        {% csrf_token %}
-        <br>
-        {{form.name.label}}
-        {{form.name}}
-        <br>
-        <br>
-        {{form.unitType.label}}
-        {{form.unitType}}
-        <br>
-        <br>
-        {{form.unitCost.label}}
-        {{form.unitCost}}
-        <br>
-        <br>
-        {{form.inventoryQuantity.label}}
-        {{form.inventoryQuantity}}
-        <br>
-        <br>
-        <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
-        <input type="submit" value="Submit"/>
-        <button style="background-color: darkred; color: white" type="button"><a href="{% url 'inventorydelete' inventory.id %}">Delete</a></button>
-    </form>
-</div>
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">Edit an item</div>
+        <div class="main-title-subtext">
+            <p>Edit <em>existing</em> inventory items here.</p>
+            <p>To add a new item, select <em>Add an item</em> on the inventory home page.</p>
+        </div>
+    </div>
 
+    <div class="right-side">
+        <form class="add-edit-form" method="POST" action="">
+            {% csrf_token %}
+            <div class="add-edit-form-fields">
+                <div class="add-edit-form-label">Name</div>
+                {{form.name}}
+                <div class="add-edit-form-label">Unit</div>
+                {{form.unitType}}
+                <div class="add-edit-form-label">Unit Cost</div>
+                {{form.unitCost}}
+                <div class="add-edit-form-label">Quantity</div>
+                {{form.inventoryQuantity}}
+            </div>
+            <div class="add-edit-form-btns">
+                <button class="add-edit-go-back-btn" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
+                <button class="add-edit-submit-btn" type="submit">Submit</button>
+            </div>
+            <button class="delete-btn" type="button" onclick="location.href='{% url 'inventorydelete' inventory.id %}'">Delete</button>
+        </form>
+    </div>
+</div>
 
 {% endblock %}

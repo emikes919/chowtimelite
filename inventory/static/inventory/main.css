@@ -1,0 +1,484 @@
+:root{
+    --primary: #5B89FF;
+    --background-grey: #ECECEC;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto';
+}
+
+body {
+    margin: 0;
+    background-color: var(--background-grey);
+}
+
+nav {
+    background-color: var(--primary);
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.25);
+    color: white;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    top: 0;
+}
+
+.nav-title-menu-container {
+    /* border-style: solid;
+    border-color: purple; */
+    display: flex;
+    gap: 25px;
+}
+
+.nav-title {
+    /* border-style: solid;
+    border-color: blue; */
+    font-size: 2rem;
+    min-width: 225px;
+}
+
+.nav-menu {
+    /* border-style: solid;
+    border-color: green; */
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+}
+
+.logout {
+    /* border-style: solid;
+    border-color: red; */
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.logout a {
+    font-weight: 600;
+}
+
+nav a {
+    color: #FFF;
+    text-decoration: none;
+}
+
+.nav-menu a {
+    color: white;
+    transition: 0.4s;
+    padding: 8px 16px;
+    border-radius: 99px;
+}
+
+.nav-menu a:hover{
+    background-color: white;
+    color: var(--primary)
+}
+
+.wrapper {
+    position: relative;
+    top: 70px;
+}
+
+/************INVENTORY LIST************/
+
+.main-container {
+    /* border: 2px solid green; */
+    padding: 25px;
+    display: flex;
+    gap: 30px;
+}
+
+.left-side {
+    /* border: 2px solid blue; */
+    min-width: 75px;
+    max-width: 225px;
+    position: fixed;
+}
+
+.main-title, .main-title-subtext p {
+    color: #5a5a5a;
+}
+
+.main-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.main-title img {
+    width: 15px;
+    height: 15px;
+}
+
+.main-title-subtext p {
+    font-size: .9rem;
+}
+
+.right-side {
+    display: flex;
+    flex-direction: column;
+    margin-left: 250px;
+}
+
+.add-first-item-btn:hover {
+    cursor: pointer;
+}
+
+.inventory-table-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 80px;
+    font-size: .9rem;
+    width: 75vw;
+    max-width: 1000px;
+    box-shadow: 0px 0px 1px 1px #c6c6c6;
+    border-radius: 6px;
+}
+
+.inventory-placeholder-text {
+    grid-column: 1/7;
+    text-align: center;
+}
+
+.inventory-table-header-cell, .inventory-table-row-cell {
+    padding: 16px;
+}
+
+.inventory-table-header-cell {
+    background-color: #dddddd;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #7c7c7c;
+    border-bottom: 1px solid rgb(180, 180, 180);
+    border-top: 1px solid rgb(180, 180, 180);
+}
+
+.inventory-table-row-cell, .inventory-placeholder-text {
+    background-color: #ffffff;
+    padding-top: 25px;
+    padding-bottom: 25px;
+}
+
+.col-2, .col-3, .col-4, .col-5, .col-6 {
+    text-align: right;
+}
+
+.last-col img {
+    width: 15px;
+    height: 15px;
+}
+
+.row-border {
+    border-bottom: 1px solid rgb(180, 180, 180);
+    grid-column: 1/7;
+}
+
+.btn-add-inventory {
+    height: 50px;
+    border-radius: 0 0 6px 6px;
+    background-color: #e1e9ff;
+    color: #5B89FF;
+    font-weight: 700;
+    border: 2px dashed #5B89FF;
+    grid-column: 1/7;
+}
+
+.btn-add-inventory:hover {
+    cursor: pointer;
+    background-color: #d5e0ff;
+}
+
+/*************INVENTORY ADD/EDIT*************/
+
+.add-edit-form {
+    padding: 30px;
+    display: flex;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0px 0px 1px 1px #c6c6c6;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.add-edit-form-fields {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: repeat(4, 1fr);
+    gap: 30px;
+}
+
+.add-edit-form-label {
+    /* border: 2px solid red; */
+    display: flex;
+    align-items: center;  
+}
+
+.add-edit-form-input {
+    border: 1px solid rgb(201, 201, 201);
+    border-radius: 4px;
+    padding-left: 5px;
+}
+
+.add-edit-form-input:focus {
+    outline: none;
+	border: 1px solid;
+	border-color: #68b2ff;
+	box-shadow: 1px 1px 5px #C9c9c9
+}
+
+.add-edit-form-label, .add-edit-form-input {
+    height: 30px;
+}
+
+.add-edit-form-btns {
+    display: flex;
+    justify-content: space-between;
+}
+
+.add-edit-form-btns button, .confirm-btn {
+    border-radius: 6px;
+    font-weight: 700;
+    width: 115px;
+}
+
+.add-edit-form-btns button, .delete-btn {
+    height: 40px;
+}
+
+.add-edit-form-btns button:hover {
+    cursor: pointer;
+}
+
+.add-edit-go-back-btn {
+    border: 2px solid #5B89FF;
+    color: #5B89FF;
+    background-color: white;
+}
+
+.add-edit-go-back-btn a {
+    text-decoration: none;
+}
+
+.add-edit-go-back-btn a:visited {
+    color: #5B89FF;
+}
+
+.add-edit-submit-btn {
+    border: 0;
+    background-color: #5B89FF;
+    color: white
+}
+
+.delete-confirmation-text {
+    margin: 0;
+}
+
+.warning-icon {
+    width: 40px;
+    height: 40px;
+    padding-bottom: 10px;
+}
+
+.delete-btn, .confirm-btn {
+    color: white;
+    background-color: #C00000;
+    border: 0;
+    font-weight: 700;
+    border-radius: 6px;
+}
+
+.delete-btn:hover, .confirm-btn:hover {
+    cursor: pointer;
+}
+
+/*************MENU LIST*************/
+
+.menu-list-flex {
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+}
+
+.menu-placeholder-text {
+    width: 70vw;
+    min-width: 200px;
+    max-width: 900px;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.menu-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 0px 3px 1px #c6c6c6;
+    padding: 30px;
+    width: 70vw;
+    min-width: 200px;
+    max-width: 900px;
+}
+
+.menu-flex a {
+    text-decoration: none;
+    color: #7c7c7c;
+}
+
+.menu-flex a:visited {
+    color: #7c7c7c;
+}
+
+.menu-flex-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.menu-flex-name a, .menu-flex-name a:visited {
+    color: #5B89FF;
+}
+
+.menu-flex-time-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.menu-flex-time {
+    font-size: .7rem;
+    color: #7c7c7c; 
+}
+
+.btn-edit-menu {
+    border: 0;
+    border-radius: 6px;
+    background-color: #5B89FF;
+    color: white;
+    font-weight: 700;
+    width: 95px;
+    height: 42px;
+}
+
+.btn-edit-menu:hover, .btn-add-menu:hover {
+    cursor: pointer;
+}
+
+.btn-add-menu {
+    height: 50px;
+    border-radius: 6px;
+    background-color: #e1e9ff;
+    color: #5B89FF;
+    font-weight: 700;
+    border: 2px dashed #5B89FF;
+}
+
+.btn-add-menu:hover {
+    cursor: pointer;
+    background-color: #d5e0ff;
+}
+
+/**********MENU VIEW**********/
+
+.menu-view-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 15px;
+    width: 190px;
+}
+
+.menu-view-go-back-btn  {
+    height: 40px;
+    border-radius: 6px;
+    font-weight: 700;
+    border: 2px solid #5B89FF;
+    color: #5B89FF;
+}
+
+.menu-view-go-back-btn:hover {
+    cursor: pointer;
+}
+
+.menu-item-grid {
+    display: grid;
+    grid-template-columns: 215px 215px 125px;
+    font-size: .9rem;
+    box-shadow: 0px 0px 1px 1px #c6c6c6;
+    border-radius: 6px;
+}
+
+.menu-item-table-header-cell, .menu-item-table-row-cell {
+    padding: 16px;
+}
+
+.menu-item-table-header-cell {
+    background-color: #dddddd;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #7c7c7c;
+    border-bottom: 1px solid rgb(180, 180, 180);
+    border-top: 1px solid rgb(180, 180, 180);
+}
+
+.menu-item-table-row-cell, .menu-item-placeholder-text {
+    background-color: #ffffff;
+    padding-top: 25px;
+    padding-bottom: 25px;
+}
+
+.menu-item-placeholder-text {
+    grid-column: 1/4;
+    text-align: center;
+}
+
+.btn-add-menu-item {
+    height: 50px;
+    border-radius: 0 0 6px 6px;
+    background-color: #e1e9ff;
+    color: #5B89FF;
+    font-weight: 700;
+    border: 2px dashed #5B89FF;
+    grid-column: 1/4;
+}
+
+.btn-add-menu-item:hover {
+    cursor: pointer;
+    background-color: #d5e0ff;
+}
+
+.row-border-menu-item {
+    border-bottom: 1px solid rgb(180, 180, 180);
+    grid-column: 1/4;
+}
+
+/**********MENU EDIT**********/
+
+.add-menu-form-fields {
+    display: flex;
+    justify-content: space-between;
+}
+
+.add-menu-form-btns {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.add-menu-form-btns button {
+    border-radius: 6px;
+    font-weight: 700;
+    width: 115px;
+}
+
+.add-menu-form-btns button {
+    height: 40px;
+}
+
+.add-menu-form-btns button:hover {
+    cursor: pointer;
+}

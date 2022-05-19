@@ -1,60 +1,40 @@
 {% extends 'inventory/header.html' %}
-
+{% load static %}
+{% load humanize %}
 {% block content %}
 
-<style>
-    /* .section-body{
-        display: flex;
-        justify-content: center;
-    } */
-    .table{
-        height: auto;
-        margin-top: auto;
-        margin-bottom: auto;
-        background: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: Roboto;
-        text-align: center;
-        border-radius: 8px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
-        padding: 20px;
-    }
-</style>
-
-
-<div class="section-body">
-    <div>
-        <h2>Inventory</h2>
-    </div class="section-table-card">
-    {% if inventory != '' %}
-        <div class="table">
-            <table>
-                <thead>
-                    <th style="text-align: left">Name</th>
-                    <th style="text-align: right">Stock</th>
-                    <th style="text-align: right">Units</th>
-                    <th style="text-align: right">Unit Cost</th>
-                    <th style="text-align: right">Total Cost</th>
-                </thead>
-                <tbody>
-                {% for item in inventory %}
-                    <tr>
-                        <td style="text-align: left">{{ item.name }}</td>
-                        <td style="text-align: right">{{ item.inventoryQuantity }}</td>
-                        <td style="text-align: right">{{ item.unitType }}</td>
-                        <td style="text-align: right">{{ item.unitCost }}</td>
-                        <td style="text-align: right">{{ item.totalCost }}</td>
-                        <td style="text-align: right"><a href="{% url 'inventoryupdate' item.id %}">Edit</a></td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">Inventory</div>
+        <div class="main-title-subtext">
+            <p>Create and track your inventory. Add or change item stock and per unit cost.</p>
+            <p>Dishes on your menus will only be available if you have enough required inventory.</p>
         </div>
-    {% endif %}
-    <button style="background-color: darkgrey;" type="button"><a href="{% url 'inventorycreate' %}">Add an item</a></button>
+    </div>
+    <div class="right-side">
+        <div class="inventory-table-grid">
+            <div class="inventory-table-header-cell col-1 first-col">Name</div>
+            <div class="inventory-table-header-cell col-2">Stock</div>
+            <div class="inventory-table-header-cell col-3">Units</div>
+            <div class="inventory-table-header-cell col-4">Unit Cost</div>
+            <div class="inventory-table-header-cell col-5">Total Cost</div>
+            <div class="inventory-table-header-cell col-6 last-col">Edit</div>
+            {% if count == 0 %}
+                <div class="inventory-placeholder-text">You don't have any inventory yet! Add your first item below.</div>
+            {% else %}
+                {% for item in inventory %}
+                    <div class="inventory-table-row-cell col-1 first-col">{{item.name}}</div>
+                    <div class="inventory-table-row-cell col-2">{{item.inventoryQuantity|intcomma}}</div>
+                    <div class="inventory-table-row-cell col-3">{{item.unitType}}</div>
+                    <div class="inventory-table-row-cell col-4">${{item.unitCost|intcomma}}</div>
+                    <div class="inventory-table-row-cell col-5">{{item.totalCost}}</div>
+                    <div class="inventory-table-row-cell col-6 last-col"><a href="{% url 'inventoryupdate' item.id %}"><img class="edit-icon" src="{% static 'inventory/edit-icon.png' %}"></a></div>
+                    <div class="row-border"></div>
+                {% endfor %}
+            {% endif %}
+            <button class="btn-add-inventory" onclick="location.href='{% url 'inventorycreate' %}'">Add an item</button>
+        </div>
+    </div>
 </div>
-
 
 {% endblock %}

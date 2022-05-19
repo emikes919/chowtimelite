@@ -17,7 +17,7 @@ def landingPage(request):
 
 def registerPage(request):
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect('inventorylist')
     else:
         form = CreateUserForm()
         if request.method == 'POST':
@@ -33,7 +33,7 @@ def registerPage(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('home') 
+        return redirect('inventorylist') 
     else:
         if request.method == 'POST':
             username = request.POST.get('username')
@@ -43,7 +43,7 @@ def login_view(request):
 
             if user is not None:
                 login(request, user)
-                return redirect('home')
+                return redirect('inventorylist')
             else:
                 messages.info(request, 'Username OR password is incorrect.')
 
@@ -62,7 +62,12 @@ def Home(request):
 def InventoryList(request):
     user = request.user
     inventory = Ingredient.objects.filter(user=user)
-    context = {'inventory': inventory}
+    count = 0
+    
+    for k in inventory:
+        count += 1
+    
+    context = {'inventory': inventory, 'count': count}
     return render(request, 'inventory/inventoryList.html', context)
 
 @login_required(login_url='login')
@@ -111,7 +116,12 @@ def InventoryDelete(request, pk):
 def MenuList(request):
     user = request.user
     menus = Menu.objects.filter(user=user)
-    context = {'menus': menus}
+    count = 0
+    
+    for k in menus:
+        count += 1
+
+    context = {'menus': menus, 'count': count}
     return render(request, 'inventory/menuList.html', context)
 
 @login_required(login_url='login')
@@ -133,7 +143,12 @@ def MenuCreate(request):
 def MenuView(request, pk):
     menu = Menu.objects.get(id=pk)
     items = MenuItem.objects.filter(menu=menu)
-    context = {'menu': menu, 'items': items}
+    count = 0
+    
+    for k in items:
+        count += 1
+
+    context = {'menu': menu, 'items': items, 'count': count}
     return render(request, 'inventory/menuView.html', context)
 
 @login_required(login_url='login')

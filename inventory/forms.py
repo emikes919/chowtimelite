@@ -1,5 +1,6 @@
 from ast import Delete
-from tkinter import Widget
+from tabnanny import verbose
+from tkinter import W, Widget
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -8,11 +9,17 @@ from django.forms import inlineformset_factory
 from .models import Ingredient, MenuItem, Menu, Order, IngredientQuantity, DishQuantity
 
 class InventoryCreateForm(forms.ModelForm):
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'add-edit-form-input'}))
+    unitType = forms.ChoiceField(widget=forms.Select(attrs={'class': 'add-edit-form-input'}), choices=Ingredient.UNIT_CHOICES)
+    unitCost = forms.DecimalField(widget=forms.NumberInput(attrs={'class': 'add-edit-form-input'}), decimal_places=2, )
+    inventoryQuantity = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'add-edit-form-input'}))
+
     class Meta:
         model = Ingredient
         fields = '__all__'
 
 class MenuCreateForm(forms.ModelForm):
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'add-edit-form-input'}))
     class Meta:
         model = Menu
         fields = '__all__'
@@ -28,10 +35,10 @@ class OrderCreateForm(forms.ModelForm):
         fields = ['customer',]
 
 class CreateUserForm(UserCreationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Create a username...'}))
-    email = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email address...'}))
-    password1 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Create a password...'}))
-    password2 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Re-enter your password...'}))
+    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-field-input'}))
+    email = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-field-input'}))
+    password1 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-field-input', 'placeholder': ' Create a password...'}))
+    password2 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-field-input', 'placeholder': ' Re-enter your password...'}))
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']

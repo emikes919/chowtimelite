@@ -22,14 +22,14 @@ class Ingredient(models.Model):
     name = models.CharField(max_length=200)
     unitType = models.CharField(max_length=200, choices=UNIT_CHOICES, verbose_name='Unit')
     unitCost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Unit Cost')
-    inventoryQuantity = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Quantity')
+    inventoryQuantity = models.IntegerField(default=0, verbose_name='Quantity')
 
     def __str__(self):
-        return self.name + ' (' + self.unitType + ')'
+        return self.name
 
     def totalCost(self):
         result = self.inventoryQuantity * self.unitCost
-        return "{:.0f}".format(result)
+        return "${:,.0f}".format(result)
 
 class Menu(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True) 

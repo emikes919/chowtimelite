@@ -1,13 +1,29 @@
 {% extends 'inventory/header.html' %}
-
+{% load static %}
 {% block content %}
 
-<form method="POST" action="">
-    {% csrf_token %}
-    <p>Are you sure you want to delete "{{obj}}"?</p>
-    
-    <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
-    <input type="submit" value="Confirm" />
-</form>
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">Menus</div>
+        <div class="main-title-subtext">
+            <p>Create and manage multiple menus.</p>
+            <p>Dishes on your menus will only be available if you have enough required inventory.</p>
+        </div>
+    </div>
+
+    <div class="right-side">
+        <form class="add-edit-form" method="POST" action="">
+            {% csrf_token %}
+            <div class="confirm-modal-text-wrapper">
+                <img class="warning-icon" src="{% static 'inventory/warning-icon.png' %}">
+                <p class="delete-confirmation-text">Are you sure you want to delete "{{obj}}"?</p>
+            </div>
+            <div class="add-edit-form-btns">
+                <button class="add-edit-go-back-btn" type="button"><a href="{{request.META.HTTP_REFERER}}">Go Back</a></button>
+                <input class="confirm-btn" type="submit" value="Confirm" />
+            </div>
+        </form>
+    </div>
+</div>
 
 {% endblock %}
