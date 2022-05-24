@@ -2,16 +2,28 @@
 
 {% block content %}
 
-<h2>{{ menu.name }}</h2>
-<hr>
-<h3>Add an item</h3>
-
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
-    <input type="submit" value="Submit"/>
-</form>
-
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">{{menu.name}}</div>
+        <div class="main-title-subtext">
+            <p>Create an item here, then edit it to add an ingredient list..</p>
+        </div>
+    </div>
+    <div class="right-side">
+        <form class="add-edit-form" method="POST" action="">
+            {% csrf_token %}
+            <div class="item-edit-form-fields">
+                <div class="add-edit-form-label">Name</div>
+                {{form.name}}
+                <div class="add-edit-form-label">Price</div>
+                {{form.price}}
+            </div>
+            <div class="add-menu-form-btns">
+                <button class="add-edit-go-back-btn" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
+                <button class="add-edit-submit-btn" type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 {% endblock %}

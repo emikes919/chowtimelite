@@ -287,12 +287,14 @@ def ItemDelete(request, pk):
 def OrderList(request):
     user = request.user
     orders = Order.objects.filter(user=user)
+    count = 0
     totalRevenue = 0
 
     for order in orders:
         totalRevenue += order.revenue()
-
-    context = {'orders': orders, 'totalrevenue': totalRevenue}
+        count += 1
+    
+    context = {'orders': orders, 'totalrevenue': totalRevenue, 'count': count}
     return render(request, 'inventory/orderList.html', context)
 
 @login_required(login_url='login')
@@ -642,6 +644,10 @@ def pnlView(request):
     user = request.user
     orders = Order.objects.filter(user=user)
     orderdict = {}
+    count = 0
+
+    for order in orders:
+        count += 1
 
     # grab every unique date 
     for order in orders:
@@ -689,5 +695,12 @@ def pnlView(request):
 
     pprint(orderdict)
 
-    context = {'orderdict': orderdict, 'totalRevenue': totalRevenue, 'totalCOGS': totalCOGS, 'totalGPdollar': totalGPdollar, 'totalGPpct': totalGPpct}
+    context = {
+        'orderdict': orderdict,
+        'totalRevenue': totalRevenue,
+        'totalCOGS': totalCOGS,
+        'totalGPdollar': totalGPdollar,
+        'totalGPpct': totalGPpct,
+        'count': count,
+    }
     return render(request, 'inventory/pnlView.html', context)

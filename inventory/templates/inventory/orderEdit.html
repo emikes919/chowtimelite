@@ -1,79 +1,64 @@
 {% extends 'inventory/header.html' %}
-
+{% load static %}
 {% block content %}
 
-<style>
-    .hidden {
-        display: none
-    }
-    #dish-heading {
-        width: 245px;
-        text-align: left
-    }
-    .error-message {
-        color: red;
-    }
-</style>
-
-<div>
-    <h2>Order #{{ order.id }}</h2>
-    <p style="font-style: italic">{{ order.timestamp }}</p>
-</div>
-
-<div>
-    <form method="POST" action="">
-        {% csrf_token %}
-        {{form.as_p}}
-        
-        <div id="order-level-error-message-div" style="display: none">
-            <p>You do not have enough inventory to update this order</p>
-            <ul id="order-level-error-message-list"></ul>
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">Order #{{order.id}}</div>
+        <div class="main-title-subtext">
+            <p><em><strong>Created at:</strong> {{order.timestamp}}</em></p>
+            <p>Modify this order here.</p>
         </div>
-
-        <table id="dish-heading">
-            <thead>
-                <tr>
-                    <th>Dish</th>
-                    <th>Quantity</th>
-                </tr>
-            </thead>
-        </table>
-
-        {{ formset.management_form }}
-
-        <div id="dish-form-list">
-            {% for dishform in formset %}
-                <div id="dish-form" class="dish-form">
-                    {% for hidden in dishform.hidden_fields %}
-                        {{ hidden }}
+        <div class="menu-view-btns">
+            <button class="delete-btn" type="button" onclick="location.href='{% url 'orderdelete' order.id %}'">Delete Order</button>
+        </div>
+    </div>
+    <div class="right-side">
+        <form class="item-edit-form" method="POST" action="">
+            {% csrf_token %}
+            {{formset.management_form}}
+            <div class="order-edit-form-fields">
+                <div class="add-edit-form-label">Customer</div>
+                {{form.customer}}
+            </div>
+            
+            <div id="order-level-error-message-div" style="display: none">
+                <p>You do not have enough inventory for this order</p>
+                <ul id="order-level-error-message-list"></ul>
+            </div>
+            
+            <div class="dish-list">
+                <div id="dish-form-list">
+                    {% for dishform in formset %}
+                        <div id="dish-form" class="dish-form">
+                            {% for hidden in dishform.hidden_fields %}
+                                {{hidden}}
+                            {% endfor %}
+                            {{dishform.menuItem}}
+                            {{dishform.dishQuantity}}
+                            <div class="hidden">{{dishform.DELETE}}</div>
+                            <button class="remove-button" id="remove-dish" type="button"><img src="{% static 'inventory/trash-icon.png' %}"></button>
+                            <div id="error-message" class="error-message"></div>
+                        </div>
                     {% endfor %}
-                    {{ dishform.menuItem }}
-                    {{ dishform.dishQuantity }}
-                    <div class="hidden">{{ dishform.DELETE }}</div>
-                    <button class="remove-button" id="remove-dish" type="button">Remove</button>
-                    <div id="error-message" class="error-message"></div>
                 </div>
-            {% endfor %}
-        </div>
+                <button id="add-more" type="button">Add a dish</button>
+            </div>
+    
+            <div id="empty-form" class="hidden">
+                {{formset.empty_form.menuItem}}
+                {{ formset.empty_form.dishQuantity}}
+                <div class="hidden">{{ formset.empty_form.DELETE }}</div>
+                <button class="remove-button" id="remove-dish" type="button"><img src="{% static 'inventory/trash-icon.png' %}"></button>
+            </div>
+    
+            <div class="add-edit-form-btns">
+                <button class="add-edit-go-back-btn" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
+                <button class="add-edit-submit-btn" type="submit">Submit</button>
+            </div>
 
-        <div id="empty-form" class="hidden">
-            {{ formset.empty_form.menuItem }}
-            {{ formset.empty_form.dishQuantity }}
-            <div class="hidden">{{ formset.empty_form.DELETE }}</div>
-            <button class="remove-button" id="remove-dish" type="button">Remove</button>
-        </div>
-
-        <br>
-        
-        <button id="add-more" type="button">Add a dish</button>
-        
-        <br>
-        <br>
-
-        <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
-        <input type="submit" value="Update order"/>
-        <button style="background-color: darkred; color: white" type="button"><a href="{% url 'orderdelete' order.id %}">Delete</a></button>
-    </form>
+        </form>
+    </div>
 </div>
 
 <script>   
@@ -144,23 +129,13 @@
                     errorMessage.push(`${quantity} ${unit.toLowerCase()} ${ingredient.toLowerCase()} required`)
                 }
     
-                errorMessage = errorMessage.join('; ')
+                errorMessage = errorMessage.join('<br>')
     
                 let errorMessageDiv = document.getElementById(`error-message-${i}`)
                 errorMessageDiv.innerHTML = errorMessageDiv.innerHTML + errorMessage
+                errorMessageDiv.style.paddingTop = '4px'
+                errorMessageDiv.style.paddingLeft = '4px'
             }
-
-            // if (dish_error_list.includes(dish)) {
-
-            //     for (let [ingredient, data] of Object.entries(dish_level_ingredient_requirements[dish])) {
-            //         let quantity = Object.keys(data)
-            //         let unit = data[quantity]
-            //         errorMessage += `${quantity} ${unit} ${ingredient} required`
-            //     }
-                
-            //     let errorMessageDiv = document.getElementById(`error-message-${i}`)
-            //     errorMessageDiv.innerHTML = errorMessageDiv.innerHTML + errorMessage
-            // }
         }
     }
 

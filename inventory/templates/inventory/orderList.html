@@ -1,53 +1,45 @@
 {% extends 'inventory/header.html' %}
-
+{% load static %}
+{% load humanize %}
 {% block content %}
 
-<h2>Order History</h2>
-
-<div>
-    {% if orders != '' %}
-        <table>
-            <thead>
-                <th style="text-align: left" width="100px">Order ID</th>
-                <th style="text-align: left">Order time</th>
-                <th style="text-align: right" width="130px">Customer</th>
-                <th style="text-align: right" width="130px">Items</th>
-                <th style="text-align: right" width="130px">Total</th>
-            </thead>
-            <tbody>
-            {% for order in orders %}
-                <tr>
-                    <td align="left" valign="top">#{{ order.id }}</td>
-                    <td align="left" valign="top">{{ order.timestamp }}</td>
-                    <td align="right" valign="top">{{ order.customer }}</td>
-                    <td style="text-align: right">
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">Order Tracking</div>
+        <div class="main-title-subtext">
+            <p>Create and track your orders. Add orders and update order content.</p>
+            <p>Order economics are reflected in the <em>performance</em> section.</p>
+            <div><strong>Total Revenue: ${{totalrevenue|intcomma}}</strong></div>
+        </div>
+    </div>
+    <div class="right-side">
+        <div class="order-table-grid">
+            <div class="order-table-header-cell col-1 first-col">Order ID</div>
+            <div class="order-table-header-cell col-2">Order time</div>
+            <div class="order-table-header-cell col-3">Customer</div>
+            <div class="order-table-header-cell col-4">Items</div>
+            <div class="order-table-header-cell col-5">Total</div>
+            <div class="order-table-header-cell col-6 last-col">Edit</div>
+            {% if count == 0 %}
+                <div class="order-placeholder-text">You don't have any orders yet! Create your first one below.</div>
+            {% else %}
+                {% for order in orders %}
+                    <div class="order-table-row-cell col-1 first-col">#{{order.id}}</div>
+                    <div class="order-table-row-cell col-2">{{order.timestamp}}</div>
+                    <div class="order-table-row-cell col-3">{{order.customer}}</div>
+                    <div class="order-table-row-cell col-4">
                         {% for dish in order.getDishQuantities %}
-                            {{ dish.menuItem }} ({{ dish.dishQuantity }}x)
-                            <br>
+                            {{dish.menuItem}} ({{dish.dishQuantity}}x)<br>
                         {% endfor %}
-                        <br>
-                    </td>
-                    <td style="text-align: right">{{ order.revenue }}</td>
-                    <td></td>
-                    <td align="right" valign="top" width="50px"><a href="{% url 'orderupdate' order.id %}">Edit</a></td>
-                </tr>
-            {% endfor %}
-                <tr style="background: lightgrey">
-                    <td>Total</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>{{ totalrevenue }}</td>
-                </tr>
-            </tbody>
-        </table>
-    {% endif %}
-    <br>
-    <button style="background-color: darkgrey;" type="button"><a href="{% url 'ordercreate' %}">Create an order</a></button>
-</div>
-<br>
-<div>
-    <button style="background-color: darkgrey;" type="button"><a href="{% url 'pnlview' %}">View PNL</a></button>
+                    </div>
+                    <div class="order-table-row-cell col-5">${{order.revenue|intcomma}}</div>
+                    <div class="order-table-row-cell col-6 last-col"><a href="{% url 'orderupdate' order.id %}"><img class="edit-icon" src="{% static 'inventory/edit-icon.png' %}"></a></div>
+                    <div class="row-border"></div>
+                {% endfor %}
+            {% endif %}
+            <button class="btn-add-order" onclick="location.href='{% url 'ordercreate' %}'">Create an order</button>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

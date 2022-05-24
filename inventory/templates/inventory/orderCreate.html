@@ -1,73 +1,62 @@
 {% extends 'inventory/header.html' %}
 {% load custom_filters %}
+{% load static %}
 {% block content %}
 
-<style>
-    .hidden {
-        display: none
-    }
-    #dish-heading {
-        width: 325px;
-        text-align: left
-    }
-    .error-message {
-        color: red;
-    }
-</style>
-
-<div>
-    <form method="POST" action="">
-        {% csrf_token %}
-        {{form.as_p}}
-        
-        <div id="order-level-error-message-div" style="display: none">
-            <p>You do not have enough inventory for this order</p>
-            <ul id="order-level-error-message-list"></ul>
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">New Order</div>
+        <div class="main-title-subtext">
+            <p>Create new order here.</p>
+            <p>Sufficient ingredients are required to record an order successfully.</p>
         </div>
-
-        <table id="dish-heading">
-            <thead>
-                <tr>
-                    <th>Dish</th>
-                    <th>Quantity</th>
-                </tr>
-            </thead>
-        </table>
-
-        {{ formset.management_form }}
-        
-        <div id="dish-form-list">
-            {% for dishform in formset %}
-                <div id="dish-form" class="dish-form">
-                    {% for hidden in dishform.hidden_fields %}
-                        {{ hidden }}
+    </div>
+    <div class="right-side">
+        <form class="item-edit-form" method="POST" action="">
+            {% csrf_token %}
+            {{formset.management_form}}
+            <div class="order-edit-form-fields">
+                <div class="add-edit-form-label">Customer</div>
+                {{form.customer}}
+            </div>
+            
+            <div id="order-level-error-message-div" style="display: none">
+                <p>You do not have enough inventory for this order</p>
+                <ul id="order-level-error-message-list"></ul>
+            </div>
+            
+            <div class="dish-list">
+                <div id="dish-form-list">
+                    {% for dishform in formset %}
+                        <div id="dish-form" class="dish-form">
+                            {% for hidden in dishform.hidden_fields %}
+                                {{hidden}}
+                            {% endfor %}
+                            {{dishform.menuItem}}
+                            {{dishform.dishQuantity}}
+                            <div class="hidden">{{dishform.DELETE}}</div>
+                            <button class="remove-button" id="remove-dish" type="button"><img src="{% static 'inventory/trash-icon.png' %}"></button>
+                            <div id="error-message" class="error-message"></div>
+                        </div>
                     {% endfor %}
-                    {{ dishform.menuItem }}
-                    {{ dishform.dishQuantity }}
-                    <div class="hidden">{{ dishform.DELETE }}</div>
-                    <button class="remove-button" id="remove-dish" type="button">Remove</button>
-                    <div id="error-message" class="error-message"></div>
                 </div>
-            {% endfor %}
-        </div>
+                <button id="add-more" type="button">Add a dish</button>
+            </div>
+    
+            <div id="empty-form" class="hidden">
+                {{formset.empty_form.menuItem}}
+                {{formset.empty_form.dishQuantity}}
+                <div class="hidden">{{formset.empty_form.DELETE}}</div>
+                <button class="remove-button" id="remove-dish" type="button"><img src="{% static 'inventory/trash-icon.png' %}"></button>
+            </div>
+    
+            <div class="add-edit-form-btns">
+                <button class="add-edit-go-back-btn" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
+                <button class="add-edit-submit-btn" type="submit">Submit</button>
+            </div>
 
-        <div id="empty-form" class="hidden">
-            {{ formset.empty_form.menuItem }}
-            {{ formset.empty_form.dishQuantity }}
-            <div class="hidden">{{ formset.empty_form.DELETE }}</div>
-            <button class="remove-button" id="remove-dish" type="button">Remove</button>
-        </div>
-
-        <br>
-        
-        <button id="add-more" type="button">Add a dish</button>
-        
-        <br>
-        <br>
-        
-        <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
-        <input id="create-order" type="submit" value="Create order"/>
-    </form>
+        </form>
+    </div>
 </div>
 
 <script> 
@@ -127,7 +116,7 @@
     function displayDishLevelErrorMessage () {     
         let dishLIST = JSON.parse("{{ dishLIST|escapejs }}")
         let dish_level_ingredient_requirements = JSON.parse("{{ error_messages_dish_level|escapejs }}")
-
+        
         for (let i = 0; i < dishLIST.length; i++) {
             if (dish_level_ingredient_requirements[i] != {}) {
                 
@@ -137,11 +126,13 @@
                     let unit = data[quantity]
                     errorMessage.push(`${quantity} ${unit.toLowerCase()} ${ingredient.toLowerCase()} required`)
                 }
-    
-                errorMessage = errorMessage.join('; ')
-    
+                
+                errorMessage = errorMessage.join('<br>')
+                
                 let errorMessageDiv = document.getElementById(`error-message-${i}`)
                 errorMessageDiv.innerHTML = errorMessageDiv.innerHTML + errorMessage
+                errorMessageDiv.style.paddingTop = '4px'
+                errorMessageDiv.style.paddingLeft = '4px'
             }
         }
     }
@@ -205,6 +196,7 @@
         const copyEmptyFormElement = document.getElementById('empty-form').cloneNode(true)
         copyEmptyFormElement.setAttribute('class', 'dish-form')
         copyEmptyFormElement.setAttribute('id',`dish-form-${currentFormCount}`)
+        
 
         const regex = new RegExp('__prefix__', 'g')
         copyEmptyFormElement.innerHTML = copyEmptyFormElement.innerHTML.replace(regex, currentFormCount)

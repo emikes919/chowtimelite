@@ -1,40 +1,40 @@
 {% extends 'inventory/header.html' %}
-
+{% load humanize %}
 {% block content %}
 
-<h2>Daily PNL Overview</h2>
-
-<div>
-    <table>
-        <thead>
-            <tr>
-                <th style="text-align: left" width="125px">Date</th>
-                <th style="text-align: right" width="75px">Revenue</th>
-                <th style="text-align: right" width="75px">COGS</th>
-                <th style="text-align: right" width="125px">Gross Profit ($)</th>
-                <th style="text-align: right" width="125px">Gross Profit (%)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for k, v in orderdict.items %}
-                <tr>
-                    <td style="text-align: left">{{ k }}</td>
-                    <td style="text-align: right">{{ v.revenue }}</td>
-                    <td style="text-align: right">{{ v.COGS }}</td>
-                    <td style="text-align: right">{{ v.GPdollar }}</td>
-                    <td style="text-align: right">{{ v.GPpct }}</td>
-                </tr>
-            {% endfor %}
-                <tr style="font-weight: bold">
-                    <td style="text-align: left">Total</td>
-                    <td style="text-align: right">{{ totalRevenue }}</td>
-                    <td style="text-align: right">{{ totalCOGS }}</td>
-                    <td style="text-align: right">{{ totalGPdollar }}</td>
-                    <td style="text-align: right">{{ totalGPpct }}</td>
-                </tr>
-        </tbody>
-    </table>
-    <br>
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">Daily Performance</div>
+        <div class="main-title-subtext">
+            <p>Data reflect life to date daily order financial performance.</p>
+        </div>
+    </div>
+    <div class="right-side">
+        <div class="performance-table-grid">
+            {% if count == 0 %}
+                <div class="performance-placeholder-text">You haven't recorded any orders yet.</div>
+            {% else %}
+                <div class="performance-table-header-cell col-1 first-col">Date</div>
+                <div class="performance-table-header-cell col-2">Revenue</div>
+                <div class="performance-table-header-cell col-3">COGS</div>
+                <div class="performance-table-header-cell col-4">Gross Profit ($)</div>
+                <div class="performance-table-header-cell col-5 last-col">Gross Profit (%)</div>
+                    {% for k, v in orderdict.items %}
+                        <div class="performance-table-row-cell col-1 first-col">{{k}}</div>
+                        <div class="performance-table-row-cell col-2">${{v.revenue|intcomma}}</div>
+                        <div class="performance-table-row-cell col-3">${{v.COGS|intcomma}}</div>
+                        <div class="performance-table-row-cell col-4">${{v.GPdollar|intcomma}}</div>
+                        <div class="performance-table-row-cell col-5 last-col">{{v.GPpct}}</div>
+                        <div class="row-border-performance"></div>
+                    {% endfor %}
+                <div class="performance-table-footer-cell col-1">Total</div>
+                <div class="performance-table-footer-cell col-2">${{totalRevenue|intcomma}}</div>
+                <div class="performance-table-footer-cell col-3">${{totalCOGS|intcomma}}</div>
+                <div class="performance-table-footer-cell col-4">${{totalGPdollar|intcomma}}</div>
+                <div class="performance-table-footer-cell col-5 last-col">{{totalGPpct}}</div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 {% endblock %}

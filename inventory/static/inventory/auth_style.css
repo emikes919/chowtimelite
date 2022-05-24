@@ -103,10 +103,12 @@ form {
     background-color: #3f66c8;
 }
 
-.messages {
+.login-error-message {
     color: red;
     font-size: .8rem;
+    margin-bottom: 6px;
 }
+
 
 .bottom-text {
     font-size: .8rem;

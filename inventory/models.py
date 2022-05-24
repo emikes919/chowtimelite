@@ -25,7 +25,7 @@ class Ingredient(models.Model):
     inventoryQuantity = models.IntegerField(default=0, verbose_name='Quantity')
 
     def __str__(self):
-        return self.name
+        return self.name + ' (' + self.unitType + ')'
 
     def totalCost(self):
         result = self.inventoryQuantity * self.unitCost

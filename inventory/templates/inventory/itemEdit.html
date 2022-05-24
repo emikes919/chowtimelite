@@ -1,66 +1,64 @@
 {% extends 'inventory/header.html' %}
+{% load static %}
 {% block content %}
 
-<style>
-    .hidden {
-        display: none
-    }
-    #ingredient-heading {
-        width: 245px;
-        text-align: left
-    }
-</style>
-
-<div>
-    <form method="POST" action="">
-        {% csrf_token %}
-        {{form.as_p}}
-        
-        <div id="error-message-div" style="display: none">
-            <p>You may not create a dish with two instances of the same ingredient.<br>Please adjust your ingredients such that this dish contains only one of each of the following:</p>
-            <ul id="error-message-list"></ul>
+<div class="main-container">
+    <div class="left-side">
+        <div class="main-title">{{item.name}}</div>
+        <div class="main-title-subtext">
+            <p>Set your item's price and define its ingredient requirements.</p>
         </div>
-
-        <table id="ingredient-heading">
-            <thead>
-                <tr>
-                    <th>Ingredient (unit)</th>
-                    <th>Quantity</th>
-                </tr>
-            </thead>
-        </table>
-
-        {{ formset.management_form }}
-        
-        <div id="ingredient-form-list">          
-            {% for ingredientForm in formset %}
-                <div id="ingredient-form" class="ingredient-form">
-                    {% for hidden in ingredientForm.hidden_fields %}
-                        {{ hidden }}
+        <div class="menu-view-btns">
+            <button class="delete-btn" type="button" onclick="location.href='{% url 'itemdelete' item.id %}'">Delete Item</button>
+        </div>
+    </div>
+    <div class="right-side">
+        <form class="item-edit-form" method="POST" action="">
+            {% csrf_token %}
+            {{formset.management_form}}
+            <div class="item-edit-form-fields">
+                <div class="add-edit-form-label">Name</div>
+                {{form.name}}
+                <div class="add-edit-form-label">Price</div>
+                {{form.price}}
+            </div>
+            
+            <div class="recipe-list">
+                <div id="ingredient-form-list">          
+                    {% for ingredientForm in formset %}
+                        <div id="ingredient-form" class="ingredient-form">
+                            {% for hidden in ingredientForm.hidden_fields %}
+                                {{hidden}}
+                            {% endfor %}
+                            {{ingredientForm.ingredient}}
+                            {{ingredientForm.ingredientQuantity}}
+                            <div class="hidden">{{ingredientForm.DELETE}}</div>
+                            <button class="remove-button" id="remove-ingredient" type="button"><img class="remove-img" src="{% static 'inventory/trash-icon.png' %}"></button>
+                        </div>
                     {% endfor %}
-                    {{ ingredientForm.ingredient }}
-                    {{ ingredientForm.ingredientQuantity }}
-                    <div class="hidden">{{ ingredientForm.DELETE }}</div>
-                    <button class="remove-button" id="remove-ingredient" type="button">Remove</button>
                 </div>
-            {% endfor %}
-        </div>
-        
-        <div id="empty-form" class="hidden">
-            {{ formset.empty_form.ingredient }}
-            {{ formset.empty_form.ingredientQuantity }}
-            <div class="hidden">{{ formset.empty_form.DELETE }}</div>
-            <button class="remove-button" id="remove-ingredient" type="button">Remove</button>
-        </div>
-        <br>
-        
-        <button id="add-more" type="button">Add an ingredient</button>
-        <br>
-        
-        <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
-        <input type="submit" id="submit" value="Submit"/>
-        <button style="background-color: darkred; color: white" type="button"><a href="{% url 'itemdelete' item.id %}">Delete</a></button>
-    </form>
+                <button id="add-more" type="button">Add an ingredient</button>
+            </div>
+            
+            <div id="empty-form" class="hidden">
+                {{formset.empty_form.ingredient}}
+                {{formset.empty_form.ingredientQuantity}}
+                <div class="hidden">{{formset.empty_form.DELETE}}</div>
+                <button class="remove-button" id="remove-ingredient" type="button"><img class="remove-img" src="{% static 'inventory/trash-icon.png' %}"></button>
+            </div>
+            
+            <div id="error-message-div" style="display: none">
+                <p>You may not create a dish with two instances of the same ingredient.</p>
+                <p>Please adjust your ingredients such that this dish contains only one of each of the following:</p>
+                <ul id="error-message-list"></ul>
+            </div>
+
+            <div class="add-edit-form-btns">
+                <button class="add-edit-go-back-btn" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
+                <button class="add-edit-submit-btn" type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
@@ -98,8 +96,13 @@
                 errorMessageUL.innerHTML = errorMessageUL.innerHTML + `<li>${errorLIST[i]}</li>`
             } 
             
-            errorMessageDiv.style.display = 'block'
+            errorMessageDiv.style.display = 'flex'
+            errorMessageDiv.style.flexDirection = 'column'
+            errorMessageDiv.style.gap = '8px'
+            errorMessageDiv.style.fontSize = '.75rem'
             errorMessageDiv.style.color = 'red'
+            errorMessageDiv.style.maxWidth = '264px'
+            errorMessageUL.style.margin = '0'
         }
     }
 
@@ -138,7 +141,7 @@
         console.log(`indexString: ${indexString}`)
         console.log(`array: ${array}`)
         console.log(`indexNum: ${indexNum}`)
-        console.log(`deletCheckbox: ${deleteCheckbox}`)
+        console.log(`deletedCheckbox: ${deleteCheckbox}`)
         
     }
     
