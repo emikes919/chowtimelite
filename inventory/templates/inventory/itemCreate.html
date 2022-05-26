@@ -6,7 +6,7 @@
     <div class="left-side">
         <div class="main-title">{{menu.name}}</div>
         <div class="main-title-subtext">
-            <p>Create an item here, then edit it to add an ingredient list..</p>
+            <p>Create an item here, then edit it to add an ingredient list.</p>
         </div>
     </div>
     <div class="right-side">
@@ -19,8 +19,8 @@
                 {{form.price}}
             </div>
             <div class="add-menu-form-btns">
-                <button class="add-edit-go-back-btn" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
-                <button class="add-edit-submit-btn" type="submit">Submit</button>
+                <button class="add-edit-go-back-btn" name="go-back" value="1" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
+                <button class="add-edit-submit-btn" name="submit" type="submit">Submit</button>
             </div>
         </form>
     </div>

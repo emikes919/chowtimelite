@@ -147,6 +147,8 @@ nav a {
 .inventory-placeholder-text {
     grid-column: 1/7;
     text-align: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 
 .inventory-table-header-cell, .inventory-table-row-cell {
@@ -164,8 +166,8 @@ nav a {
 
 .inventory-table-row-cell, .inventory-placeholder-text {
     background-color: #ffffff;
-    padding-top: 25px;
-    padding-bottom: 25px;
+    /* padding-top: 25px;
+    padding-bottom: 25px; */
 }
 
 .col-2, .col-3, .col-4, .col-5, .col-6 {
@@ -433,13 +435,15 @@ nav a {
 
 .menu-item-table-row-cell, .menu-item-placeholder-text {
     background-color: #ffffff;
-    padding-top: 25px;
-    padding-bottom: 25px;
+    /* padding-top: 25px;
+    padding-bottom: 25px; */
 }
 
 .menu-item-placeholder-text {
     grid-column: 1/4;
     text-align: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 
 .btn-add-menu-item {
@@ -539,7 +543,7 @@ nav a {
 .remove-button  {
     border: none;
     width: 100%;
-    /* background-image: url("./trash-icon.png"); */
+    /* background-image: url("trash-icon.png"); */
     background-color: white;
     display: flex;
     justify-content: center;
@@ -552,7 +556,7 @@ nav a {
     width: 20px;
 }
 
-.remove-button img:hover {
+.remove-button:hover {
     cursor: pointer;
 }
 
@@ -591,6 +595,8 @@ nav a {
 .order-placeholder-text {
     grid-column: 1/7;
     text-align: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 
 .order-table-header-cell, .order-table-row-cell {
@@ -607,8 +613,8 @@ nav a {
 
 .order-table-row-cell, .order-placeholder-text {
     background-color: #ffffff;
-    padding-top: 25px;
-    padding-bottom: 25px;
+    /* padding-top: 25px;
+    padding-bottom: 25px; */
 }
 
 .btn-add-order {
@@ -687,6 +693,8 @@ nav a {
 .performance-placeholder-text {
     grid-column: 1/6;
     text-align: center;
+    padding-top: 25px;
+    padding-bottom: 25px;
 }
 
 .performance-table-header-cell,
@@ -710,14 +718,13 @@ nav a {
     text-transform: uppercase;
     color: #7c7c7c;
     border-bottom: 1px solid rgb(180, 180, 180);
-    
 }
 
 .performance-table-row-cell,
 .performance-placeholder-text {
     background-color: #ffffff;
-    padding-top: 25px;
-    padding-bottom: 25px;
+    /* padding-top: 25px;
+    padding-bottom: 25px; */
 }
 
 .row-border-performance {

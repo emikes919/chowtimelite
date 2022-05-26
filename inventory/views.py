@@ -76,6 +76,10 @@ def InventoryCreate(request):
 
     if request.method == 'POST':
         form = InventoryCreateForm(request.POST)
+
+        if request.POST.get('go-back'):
+            return redirect('inventorylist')
+
         if form.is_valid():
             ingredient = form.save(commit=False)
             ingredient.user = request.user
@@ -94,6 +98,10 @@ def InventoryUpdate(request, pk):
 
     if request.method == 'POST':
         form = InventoryCreateForm(request.POST, instance=inventory)
+        
+        if request.POST.get('go-back'):
+            return redirect('inventorylist')
+        
         if form.is_valid():
             inventory = form.save(commit=False)
             inventory.user = request.user
@@ -130,6 +138,10 @@ def MenuCreate(request):
 
     if request.method == 'POST':
         form = MenuCreateForm(request.POST)
+
+        if request.POST.get('go-back'):
+            return redirect('menulist')
+
         if form.is_valid():
             menu = form.save(commit=False)
             menu.user = request.user
@@ -158,11 +170,15 @@ def MenuUpdate(request, pk):
 
     if request.method == 'POST':
         form = MenuCreateForm(request.POST, instance=menu)
+
+        if request.POST.get('go-back'):
+            return redirect('menuview', menu.id)
+
         if form.is_valid():
             menu = form.save(commit=False)
             menu.user = request.user
             menu.save()
-            return redirect('menulist')
+            return redirect('menuview', menu.id)
     
     context = {'form': form, 'menu': menu}
     return render(request, 'inventory/menuUpdate.html', context)
@@ -170,6 +186,7 @@ def MenuUpdate(request, pk):
 @login_required(login_url='login')
 def MenuDelete(request, pk):
     menu = Menu.objects.get(id=pk)
+    
     if request.method == 'POST':
         menu.delete()
         return redirect('menulist')
@@ -185,7 +202,15 @@ def ItemCreate(request, pk):
     form = ItemCreateForm()
 
     if request.method == 'POST':
+
+        print('request')
+        print(request.POST)
+
         form = ItemCreateForm(request.POST)
+
+        if request.POST.get('go-back'):
+            return redirect('menuview', menu.id)
+
         if form.is_valid():
             item = form.save(commit=False)
             item.menu = menu
@@ -210,6 +235,9 @@ def ItemUpdate(request, pk):
     ingredientLIST = []
     errorLIST = []
     error = False
+
+    if request.POST.get('go-back'):
+        return redirect('menuview', item.menu.id)
 
     if request.method == 'POST':
         pprint('request.POST:')
@@ -302,6 +330,9 @@ def OrderCreate(request):
     form = OrderCreateForm
     formset = DishQuantityFormset(form_kwargs={'user': request.user})
 
+    if request.POST.get('go-back'):
+        return redirect('orderlist')
+
     error = False
     error_messages_order_level = {}
     error_messages_dish_level = {}
@@ -312,6 +343,7 @@ def OrderCreate(request):
         print('request.POST :')
         print(request.POST)
         form = OrderCreateForm(request.POST)
+
         if form.is_valid():
             order = form.save(commit=False)
             order.user = request.user
@@ -330,8 +362,12 @@ def OrderCreate(request):
                     dishLIST.append(dish_name) # make a list of each dish name in the order
                     
                     if formData['DELETE'] == False:
-                        menuItem = MenuItem.objects.get(name=dish) # grab the MenuItem DB object based on menuItem in form
+                        # grab the MenuItem DB object based on menuItem in form, first filter by user to deal with edge cases where two users create the same menu item
+                        menuItem = MenuItem.objects.filter(user=request.user) 
                         
+                        # then grab the MenuItem DB object by name
+                        menuItem = menuItem.get(name=dish)
+
                         # loop through ingredients in that MenuItem to populate blank dict
                         for ingredient in IngredientQuantity.objects.filter(menuItem=menuItem): 
                             # check if ingredient is already in blank dict to prevent overwriting, else map name and quantity to dict as k, v pair 
@@ -355,7 +391,9 @@ def OrderCreate(request):
 
                 # run order level validation logic - error message list populated with current quantity of ingredient available
                 for ingredient in ingredientDICT.keys():
-                    ingredient_object_to_check = Ingredient.objects.get(name=ingredient)
+                    ingredient_object_to_check = Ingredient.objects.filter(user=request.user)
+                    ingredient_object_to_check = ingredient_object_to_check.get(name=ingredient)
+
                     current_quantity = float(ingredient_object_to_check.inventoryQuantity)
                     unit = ingredient_object_to_check.unitType
                     order_quantity = ingredientDICT[ingredient]
@@ -377,7 +415,9 @@ def OrderCreate(request):
                         dish = formData['menuItem']
                         dish_id = i
                         dish_name = dish.name
-                        menuItem = MenuItem.objects.get(name=dish)
+                        menuItem = MenuItem.objects.filter(user=request.user) 
+                        menuItem = menuItem.get(name=dish)
+
                         dish_ingredientsDICT = {}
                         for ingredient in IngredientQuantity.objects.filter(menuItem=menuItem): 
                             ingredient_name = ingredient.ingredient.name
@@ -400,7 +440,8 @@ def OrderCreate(request):
                 # check if an error has been triggered, if not update the DB and redirect
                 if not error:
                     for ingredient in ingredientDICT.keys(): # loop through the ingredients themselves to gather what we need to adjust the DB
-                        ingredient_to_adjust = Ingredient.objects.get(name=ingredient)
+                        ingredient_to_adjust = Ingredient.objects.filter(user=request.user)
+                        ingredient_to_adjust = ingredient_to_adjust.get(name=ingredient)
                         ingredient_to_adjust.inventoryQuantity -= ingredientDICT[ingredient]
                         ingredient_to_adjust.save()
                     formset.save()
@@ -426,6 +467,9 @@ def OrderUpdate(request, pk):
     form = OrderCreateForm(instance=order)
     formset = DishQuantityFormset(instance=order, form_kwargs={'user': request.user})
     
+    if request.POST.get('go-back'):
+        return redirect('orderlist')
+
     # grab ingredient data from existing order
     existing_dishLIST = []
     existing_ingredientDICT = {}
@@ -480,7 +524,12 @@ def OrderUpdate(request, pk):
                 dish = new_form_data['menuItem']
                 dish_name = dish.name
                 new_dishLIST.append(dish_name) # make a list of each dish name in the order
-                menuItem = MenuItem.objects.get(name=dish) # grab the MenuItem DB object based on menuItem in form
+                
+                # grab the MenuItem DB object based on menuItem in form, first filter by user to deal with edge cases where two users create the same menu item
+                menuItem = MenuItem.objects.filter(user=request.user) 
+                        
+                # then grab the MenuItem DB object by name
+                menuItem = menuItem.get(name=dish)
                 
                 if new_form_data['DELETE'] == True:
                     for ingredient in IngredientQuantity.objects.filter(menuItem=menuItem):
@@ -535,7 +584,8 @@ def OrderUpdate(request, pk):
             for ingredient_diff in diff_ingredientDICT.keys():
                 diff_quantity = diff_ingredientDICT[ingredient_diff]
                 if diff_quantity > 0:
-                    ingredient_object_to_check = Ingredient.objects.get(name=ingredient_diff)
+                    ingredient_object_to_check = Ingredient.objects.filter(user=request.user)
+                    ingredient_object_to_check = ingredient_object_to_check.get(name=ingredient_diff)
                     ingredient_name = ingredient_object_to_check.name
                     current_quantity = float(ingredient_object_to_check.inventoryQuantity)
                     unit = ingredient_object_to_check.unitType
@@ -556,7 +606,10 @@ def OrderUpdate(request, pk):
                     dish = formData['menuItem']
                     dish_id = i
                     dish_name = dish.name
-                    menuItem = MenuItem.objects.get(name=dish)
+                    menuItem = MenuItem.objects.filter(user=request.user) 
+                    menuItem = menuItem.get(name=dish)
+
+
                     dish_ingredientsDICT = {}
                     for ingredient in IngredientQuantity.objects.filter(menuItem=menuItem): 
                         ingredient_name = ingredient.ingredient.name
@@ -579,7 +632,8 @@ def OrderUpdate(request, pk):
             # check if error triggered, and update DB and redirect
             if not error:
                 for ingredient in diff_ingredientDICT.keys(): # loop through the ingredients themselves to gather what we need to adjust the DB
-                    ingredient_to_adjust = Ingredient.objects.get(name=ingredient)
+                    ingredient_to_adjust = Ingredient.objects.filter(user=request.user)
+                    ingredient_to_adjust = ingredient_to_adjust.get(name=ingredient)
                     ingredient_to_adjust.inventoryQuantity -= diff_ingredientDICT[ingredient]
                     ingredient_to_adjust.save()
                 formset.save()
@@ -630,7 +684,9 @@ def OrderDelete(request, pk):
         print()
 
         for ingredient in ingredientDICT.keys():
-            ingredient_object_to_adjust = Ingredient.objects.get(name=ingredient)
+            ingredient_object_to_adjust = Ingredient.objects.filter(user=request.user)
+            ingredient_object_to_adjust = ingredient_object_to_adjust.get(name=ingredient)
+            
             ingredient_object_to_adjust.inventoryQuantity += ingredientDICT[ingredient]
             ingredient_object_to_adjust.save()
             

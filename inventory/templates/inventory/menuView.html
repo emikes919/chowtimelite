@@ -10,7 +10,8 @@
             <p>Manage your menu here. Add items, then edit them to assign them the required ingredients.</p>
         </div>
         <div class="menu-view-btns">
-            <button class="menu-view-go-back-btn" type="button" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
+            <!-- <button class="menu-view-go-back-btn" type="button" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button> -->
+            <button class="menu-view-go-back-btn" type="button" onclick="location.href='{% url 'menulist' %}'">Go Back</button>
             <button class="delete-btn" type="button" onclick="location.href='{% url 'menudelete' menu.id %}'">Delete Menu</button>
         </div>
     </div>

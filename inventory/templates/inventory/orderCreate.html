@@ -51,8 +51,8 @@
             </div>
     
             <div class="add-edit-form-btns">
-                <button class="add-edit-go-back-btn" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
-                <button class="add-edit-submit-btn" type="submit">Submit</button>
+                <button class="add-edit-go-back-btn" name="go-back" value="1" onclick="location.href='{{request.META.HTTP_REFERER}}'">Go Back</button>
+                <button class="add-edit-submit-btn" name="submit" type="submit">Submit</button>
             </div>
 
         </form>
