@@ -1,0 +1,1 @@
+web: gunicorn chowtimelite.wsgi --log-file -
