@@ -33,7 +33,8 @@
                             {{ingredientForm.ingredient}}
                             {{ingredientForm.ingredientQuantity}}
                             <div class="hidden">{{ingredientForm.DELETE}}</div>
-                            <button class="remove-button" id="remove-ingredient"><img class="remove-img" onclick="" src="{% static 'inventory/trash-icon.png' %}"></button>
+                            <!-- <button class="remove-button"><img class="remove-img" src="{% static 'inventory/trash-icon.png' %}"></button> -->
+                            <div class="remove-button">❌</div>
                             <!-- <input class="remove-button" id="remove-ingredient" type="submit" value="" style="background: url('{% static 'inventory/trash-icon.png' %}')"> -->
                         </div>
                     {% endfor %}
@@ -45,7 +46,8 @@
                 {{formset.empty_form.ingredient}}
                 {{formset.empty_form.ingredientQuantity}}
                 <div class="hidden">{{formset.empty_form.DELETE}}</div>
-                <button class="remove-button" id="remove-ingredient"><img class="remove-img" onclick="" src="{% static 'inventory/trash-icon.png' %}"></button>
+                <!-- <button class="remove-button"><img class="remove-img" src="{% static 'inventory/trash-icon.png' %}"></button> -->
+                <div class="remove-button">❌</div>
                 <!-- <input class="remove-button" id="remove-ingredient" type="submit" value="" style="background: url('{% static 'inventory/trash-icon.png' %}')"> -->
             </div>
             
