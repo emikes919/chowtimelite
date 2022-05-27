@@ -43,7 +43,7 @@
                         <div class="error-message">
                             {% if form.password1.errors %}
                                 {% for error in form.password1.errors %}
-                                    {{ error|escape }}
+                                    {{ error|escape }}<br>
                                 {% endfor %}
                             {% endif %}
                         </div>
@@ -51,7 +51,7 @@
                         <div class="error-message">
                             {% if form.password2.errors %}
                                 {% for error in form.password2.errors %}
-                                    {{ error|escape }}
+                                    {{ error|escape }}<br>
                                 {% endfor %}
                             {% endif %}
                         </div>

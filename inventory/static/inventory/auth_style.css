@@ -68,7 +68,9 @@ form {
     padding-left: 5px;
 }
 
-.form-field-input, .button {
+.form-field-input,
+.button,
+.error-message {
     width: 17rem;
 }
 
@@ -83,6 +85,7 @@ form {
     color: red;
     font-size: .8rem;
     text-align: left;
+    /* word-wrap: break-word; */
 }
 
 .button {

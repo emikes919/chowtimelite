@@ -4,14 +4,28 @@ import uuid
 import datetime
 
 class Ingredient(models.Model):
-    GRAM = 'Grams'
-    OUNCE = 'Ounces'
-    PIECE = 'Pieces'
+    GR = 'Grams'
+    OZ = 'Ounces'
+    PC = 'Pieces'
+    KG = 'Kilograms'
+    FLOZ = 'Fluid Ounces'
+    ML = 'Milliliters'
+    L = 'Liters'
+    LF = 'Loafs'
+    CP = 'Cups'
+    BL = 'Bottles'    
 
     UNIT_CHOICES = [
-        ('Grams', 'Grams'),
-        ('Ounces', 'Ounces'),
-        ('Pieces', 'Pieces')
+        ('Grams', GR),
+        ('Ounces', OZ),
+        ('Pieces', PC),
+        ('Kilograms', KG),
+        ('Fluid Ounces', FLOZ),
+        ('Milliliters', ML),
+        ('Liters', L),
+        ('Loafs', LF),
+        ('Cups', CP),
+        ('Bottles', BL),
     ]
 
     '''
@@ -63,7 +77,7 @@ class MenuItem(models.Model):
 class IngredientQuantity(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     menuItem = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
-    ingredientQuantity = models.IntegerField(default=0)
+    ingredientQuantity = models.DecimalField(decimal_places=2, max_digits=5, default=0)
 
     def __str__(self):
         return str(self.ingredient)

@@ -586,7 +586,7 @@ nav a {
 
 .order-table-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 80px;
+    grid-template-columns: .6fr 1.2fr 1fr 1.25fr .75fr 80px;
     font-size: .9rem;
     width: 75vw;
     max-width: 1000px;
@@ -713,7 +713,6 @@ nav a {
     text-transform: uppercase;
     color: #7c7c7c;
     border-bottom: 1px solid rgb(180, 180, 180);
-    border-top: 1px solid rgb(180, 180, 180);
 }
 
 .performance-table-footer-cell {

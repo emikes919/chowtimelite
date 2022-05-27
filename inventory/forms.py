@@ -12,7 +12,7 @@ from .models import Ingredient, MenuItem, Menu, Order, IngredientQuantity, DishQ
 class InventoryCreateForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'add-edit-form-input'}))
     unitType = forms.ChoiceField(widget=forms.Select(attrs={'class': 'add-edit-form-input'}), choices=Ingredient.UNIT_CHOICES)
-    unitCost = forms.DecimalField(widget=forms.NumberInput(attrs={'class': 'add-edit-form-input'}), decimal_places=2, min_value=0.1)
+    unitCost = forms.DecimalField(widget=forms.NumberInput(attrs={'class': 'add-edit-form-input'}), decimal_places=2, min_value=0.01)
     inventoryQuantity = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'add-edit-form-input'}), min_value=1)
 
     class Meta:
@@ -28,7 +28,7 @@ class MenuCreateForm(forms.ModelForm):
 
 class ItemCreateForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'add-edit-form-input'}))
-    price = forms.DecimalField(widget=forms.NumberInput(attrs={'class': 'add-edit-form-input'}), decimal_places=2, min_value=0.1)
+    price = forms.DecimalField(widget=forms.NumberInput(attrs={'class': 'add-edit-form-input'}), decimal_places=2, min_value=0.01)
 
     class Meta:
         model = MenuItem
@@ -44,8 +44,8 @@ class OrderCreateForm(forms.ModelForm):
 class CreateUserForm(UserCreationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-field-input'}))
     email = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-field-input'}))
-    password1 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-field-input', 'placeholder': ' Create a password...'}))
-    password2 = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-field-input', 'placeholder': ' Re-enter your password...'}))
+    password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-field-input', 'placeholder': ' Create a password...'}))
+    password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-field-input', 'placeholder': ' Re-enter your password...'}))
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
@@ -57,7 +57,7 @@ class ItemIngredientForm(forms.ModelForm):
         self.fields['ingredient'].queryset = Ingredient.objects.filter(user=self.user)
 
     ingredient = forms.ModelChoiceField(widget=forms.Select(attrs={'class': 'add-edit-form-input'}), queryset=Ingredient.objects.all(), empty_label="Select an ingredient...")
-    ingredientQuantity = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'add-item-dynamic-quantity-form-input'}), min_value=1)
+    ingredientQuantity = forms.DecimalField(widget=forms.NumberInput(attrs={'class': 'add-item-dynamic-quantity-form-input'}), min_value=.01, decimal_places=2)
 
 IngredientQuantityFormset = inlineformset_factory(
     MenuItem, IngredientQuantity, form=ItemIngredientForm, fields=('ingredient', 'ingredientQuantity'), can_delete=True, extra=0

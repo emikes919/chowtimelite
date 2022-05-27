@@ -1,5 +1,4 @@
 {% extends 'inventory/header.html' %}
-{% load humanize %}
 {% block content %}
 
 <div class="main-container">
@@ -21,16 +20,16 @@
                 <div class="performance-table-header-cell col-5 last-col">Gross Profit (%)</div>
                     {% for k, v in orderdict.items %}
                         <div class="performance-table-row-cell col-1 first-col">{{k}}</div>
-                        <div class="performance-table-row-cell col-2">${{v.revenue|intcomma}}</div>
-                        <div class="performance-table-row-cell col-3">${{v.COGS|intcomma}}</div>
-                        <div class="performance-table-row-cell col-4">${{v.GPdollar|intcomma}}</div>
+                        <div class="performance-table-row-cell col-2">{{v.revenue}}</div>
+                        <div class="performance-table-row-cell col-3">{{v.COGS}}</div>
+                        <div class="performance-table-row-cell col-4">{{v.GPdollar}}</div>
                         <div class="performance-table-row-cell col-5 last-col">{{v.GPpct}}</div>
                         <div class="row-border-performance"></div>
                     {% endfor %}
                 <div class="performance-table-footer-cell col-1">Total</div>
-                <div class="performance-table-footer-cell col-2">${{totalRevenue|intcomma}}</div>
-                <div class="performance-table-footer-cell col-3">${{totalCOGS|intcomma}}</div>
-                <div class="performance-table-footer-cell col-4">${{totalGPdollar|intcomma}}</div>
+                <div class="performance-table-footer-cell col-2">{{totalRevenue}}</div>
+                <div class="performance-table-footer-cell col-3">{{totalCOGS}}</div>
+                <div class="performance-table-footer-cell col-4">{{totalGPdollar}}</div>
                 <div class="performance-table-footer-cell col-5 last-col">{{totalGPpct}}</div>
             {% endif %}
         </div>

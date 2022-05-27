@@ -732,7 +732,7 @@ def pnlView(request):
                                                                               timestamp__day=orderdate.day,
                                                                               user=user))
         orderdict[orderdate]['GPdollar'] = orderdict[orderdate]['revenue'] - orderdict[orderdate]['COGS']
-        orderdict[orderdate]['GPpct'] = '{:0.1%}'.format(orderdict[orderdate]['GPdollar'] / orderdict[orderdate]['revenue'])
+        orderdict[orderdate]['GPpct'] = orderdict[orderdate]['GPdollar'] / orderdict[orderdate]['revenue']
 
     # calc subtotals of revenue, COGS, and GP
     totalRevenue = 0
@@ -747,7 +747,19 @@ def pnlView(request):
     if totalRevenue == 0:
         totalGPpct = 'n/a'
     else:
-        totalGPpct = '{:0.1%}'.format(totalGPdollar / totalRevenue)
+        totalGPpct = totalGPdollar / totalRevenue
+
+    # format output numbers
+    for orderdate in orderdict.keys():
+        orderdict[orderdate]['revenue'] = '${:.2f}'.format(orderdict[orderdate]['revenue'])
+        orderdict[orderdate]['COGS'] = '${:.2f}'.format(orderdict[orderdate]['COGS'])
+        orderdict[orderdate]['GPdollar'] = '${:.2f}'.format(orderdict[orderdate]['GPdollar'])
+        orderdict[orderdate]['GPpct'] = '{:0.1%}'.format(orderdict[orderdate]['GPpct'])
+    
+    totalRevenue = '${:.2f}'.format(totalRevenue)
+    totalCOGS = '${:.2f}'.format(totalCOGS)
+    totalGPdollar = '${:.2f}'.format(totalGPdollar)
+    totalGPpct = '{:0.1%}'.format(totalGPpct)
 
     pprint(orderdict)
 
