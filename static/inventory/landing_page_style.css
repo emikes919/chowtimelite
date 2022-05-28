@@ -1,0 +1,80 @@
+:root {
+    background: #ECECEC;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Roboto;
+}
+
+.card {
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 16px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
+    padding: 40px;
+}
+
+.card-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.welcome-text h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.signup-login-text h3 {
+    color: #939393;
+    font-size: 12pt;
+    font-weight: normal;
+    margin: 0;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 20px
+}
+
+button {
+    width: 308px;
+    height: 56px;
+    border-radius: 8px;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-family: Roboto;
+    font-size: 12pt;
+    font-weight: bold;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+#sign-up-button {
+    background: #5B89FF;
+    border: none;
+    color: white;
+}
+#log-in-button {
+    background: white;
+    border: 2px solid #5B89FF;
+    color: #5B89FF;
+}
+#sign-up-button:hover {
+    background-color: #3f66c8;
+}
+#log-in-button:hover {
+    border: 2px solid #3f66c8;
+    color: #3f66c8;
+}
