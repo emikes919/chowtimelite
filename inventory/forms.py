@@ -1,7 +1,3 @@
-from ast import Delete
-from tabnanny import verbose
-from tkinter import W, Widget
-from tkinter.tix import Select
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
