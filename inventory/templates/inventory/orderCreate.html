@@ -35,8 +35,8 @@
                             {{dishform.menuItem}}
                             {{dishform.dishQuantity}}
                             <div class="hidden">{{dishform.DELETE}}</div>
-                            <div class="remove-button">❌</div>
-                            <!-- <button class="remove-button" type="button"><img src="{% static 'inventory/trash-icon.png' %}"></button> -->
+                            <div class="remove-button" type="button"><img src="{% static 'inventory/trash-icon.png' %}"></div>
+                            <!-- <div class="remove-button">❌</div> -->
                             <div id="error-message" class="error-message"></div>
                         </div>
                     {% endfor %}
@@ -48,8 +48,8 @@
                 {{formset.empty_form.menuItem}}
                 {{formset.empty_form.dishQuantity}}
                 <div class="hidden">{{formset.empty_form.DELETE}}</div>
-                <div class="remove-button">❌</div>
-                <!-- <button class="remove-button" type="button"><img src="{% static 'inventory/trash-icon.png' %}"></button> -->
+                <div class="remove-button" type="button"><img src="{% static 'inventory/trash-icon.png' %}"></div>
+                <!-- <div class="remove-button">❌</div> -->
             </div>
     
             <div class="add-edit-form-btns">
@@ -170,7 +170,15 @@
             event.preventDefault()
         }
         
-        let dishFormToBeRemoved = event.path[1]
+        pathPositionZero = event.path[1]
+
+        if (pathPositionZero.id == '') {
+            targetIndexNum = 2
+        } else {
+            targetIndexNum = 1
+        }
+        
+        let dishFormToBeRemoved = event.path[targetIndexNum]
         let indexString = dishFormToBeRemoved.id
         let array = indexString.split('-')
         let indexNum = array[2]

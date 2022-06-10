@@ -543,8 +543,8 @@ nav a {
 .remove-button  {
     /* border: none; */
     /* width: 100%; */
-    /* border-radius: 6px;
-    background-color: #C00000; */
+    /* border-radius: 6px; */
+    /* background-color: none; */
     color: white;
     font-weight: bold;
     font-size: .8em;

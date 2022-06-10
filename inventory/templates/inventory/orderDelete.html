@@ -15,7 +15,7 @@
             {% csrf_token %}
             <div class="confirm-modal-text-wrapper">
                 <img class="warning-icon" src="{% static 'inventory/warning-icon.png' %}">
-                <p class="delete-confirmation-text">Are you sure you want to Order #{{obj}}?</p>
+                <p class="delete-confirmation-text">Are you sure you want to delete Order #{{obj}}?</p>
             </div>
             <div class="add-edit-form-btns">
                 <button class="add-edit-go-back-btn" type="button"><a href="{{request.META.HTTP_REFERER}}">Go Back</a></button>

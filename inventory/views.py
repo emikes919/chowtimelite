@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from pprint import pprint
-import json
+import json, datetime
 
 from .models import Ingredient, IngredientQuantity, MenuItem, Menu, Order, DishQuantity
 from .forms import InventoryCreateForm, MenuCreateForm, ItemCreateForm, OrderCreateForm, CreateUserForm, IngredientQuantityFormset, DishQuantityFormset
@@ -704,7 +704,7 @@ def pnlView(request):
     # grab every unique date 
     for order in orders:
         orderdict[order.timestamp.date()] = {}
-    
+
     def getRevenueFromOrders(orderlist):
         revenue = 0
         for order in orderlist:
@@ -727,8 +727,10 @@ def pnlView(request):
                                                                               timestamp__month=orderdate.month,
                                                                               timestamp__day=orderdate.day,
                                                                               user=user))
+
         orderdict[orderdate]['GPdollar'] = orderdict[orderdate]['revenue'] - orderdict[orderdate]['COGS']
         orderdict[orderdate]['GPpct'] = orderdict[orderdate]['GPdollar'] / orderdict[orderdate]['revenue']
+        
 
     # calc subtotals of revenue, COGS, and GP
     totalRevenue = 0
@@ -755,7 +757,10 @@ def pnlView(request):
     totalRevenue = '${:.2f}'.format(totalRevenue)
     totalCOGS = '${:.2f}'.format(totalCOGS)
     totalGPdollar = '${:.2f}'.format(totalGPdollar)
-    totalGPpct = '{:0.1%}'.format(totalGPpct)
+    try:
+        totalGPpct = '{:0.1%}'.format(totalGPpct)
+    except:
+        totalGPpct = totalGPpct
 
     pprint(orderdict)
 
